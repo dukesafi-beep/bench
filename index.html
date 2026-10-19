@@ -156,6 +156,25 @@ footer{background:linear-gradient(125deg,#15392f,#1e4c3c);border-top:3px solid #
 @media(hover:hover){.card{transition:transform .2s,box-shadow .2s}.card:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(36,62,49,.10)}}
 @media(max-width:700px){.pz{opacity:.6}.hero>.pz{opacity:.75}.nav{background:#fff9ef}.pbox{padding:14px}.pc{padding:20px 12px}}
 @media(prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
+
+/* Crisp colour and protected content layers */
+section{isolation:isolate}
+section>.pz{z-index:-1;opacity:1;filter:none}
+section>.wrap{position:relative;z-index:1}
+.hero{isolation:isolate}
+.hero>.pz{z-index:-1;filter:none;opacity:1}
+.hero>div{z-index:1}
+#services{background:linear-gradient(115deg,#cde77e 0%,#ffe6a3 52%,#f3b2cf 100%)}
+#process{background:linear-gradient(110deg,#b79ae9,#a6c6f0 52%,#6ed3dc)}
+#plans{background:linear-gradient(110deg,#ffd05a,#ffad88 55%,#ee8eb8)}
+#start{background:linear-gradient(115deg,#80cbb3,#b4a9e7 62%,#d99ee8)}
+#book{background:linear-gradient(110deg,#b6d768,#f7c65a 65%,#f0a17c)}
+.hero{background:radial-gradient(ellipse at 100% 0,#6ad5e1 0,transparent 52%),radial-gradient(ellipse at 0 100%,#ffcd43 0,transparent 55%),#fff8eb}
+.pbox,.card,.panel,.step{background:#fff}
+.pc.m{background:#ffd04e!important}.pc.t{background:#ff9b7e!important}.pc.f{background:#b2d46c!important}.pc.c{background:#64cfdd!important}
+.hero p.lead,.sh p,.card p,.step p,.fine,.pc p{color:#3e554d}
+.pz{pointer-events:none!important}
+@media(max-width:700px){section>.pz{width:58px!important;opacity:.7;scale:1}.hero>.pz{width:50px!important;opacity:.85;scale:1}.hero>.pz:nth-of-type(1){right:4px!important;top:12px!important}.hero>.pz:nth-of-type(2){left:auto!important;right:8px!important;bottom:8px!important}.hero>.pz:nth-of-type(3){display:none}}
 </style>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
@@ -328,6 +347,7 @@ set(lang);
 </script>
 </body>
 </html>
+
 
 
 
