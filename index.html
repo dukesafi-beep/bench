@@ -104,6 +104,26 @@ body{font-family:'DM Sans',sans-serif;line-height:1.7}h1,h2,h3,.logo{font-family
 @media(max-width:900px){.grid3{grid-template-columns:1fr}.hero{gap:36px;padding-top:55px;padding-bottom:55px}.hero h1{letter-spacing:-1.8px}.pgrid{grid-template-columns:repeat(4,1fr)}.pc{padding:18px 10px}.pc h3{font-size:12px}.pc p{font-size:11px}.right .btn{display:none}.sh{margin-bottom:30px}section{padding:56px 0}.bk{gap:20px}}
 @media(max-width:480px){.wrap{padding-left:20px;padding-right:20px}.pgrid{grid-template-columns:1fr 1fr}.card,.panel,.step{padding:24px}.nav{padding:18px 20px}.hero .btns{gap:12px}.hero h1{font-size:43px}.cal{height:620px}}
 @media(max-width:900px){nav{display:flex;order:3;width:100%;gap:8px;overflow-x:auto;padding:8px 0}nav a{white-space:nowrap;padding:8px 10px;min-height:44px}nav a[href*="visibility-check"]{background:var(--forest);color:white;border-radius:6px}.nav{gap:10px}}
+
+/* Colourful ALTIGRA puzzle identity */
+:root{--pink:#ff6aa2;--cyan:#48ccd6;--violet:#9875ef}
+header{background:rgba(249,246,240,.97)}
+body{background:#f9f6f0}
+.hero{background:radial-gradient(ellipse at 90% 15%,#d9edf0 0,transparent 46%),radial-gradient(ellipse at 15% 95%,#fbe6b8 0,transparent 48%);position:relative;isolation:isolate}
+.pz{display:block;opacity:.72;stroke:#23473d;stroke-width:1.3;z-index:0;animation:fl 9s ease-in-out infinite}
+.hero>.pz{z-index:-1}
+#services{background:linear-gradient(125deg,#edf4e7 0%,#f8f4e7 48%,#f4e8ee 100%)}
+#process{background:linear-gradient(120deg,#eee9f7,#e7f2f3)}
+#plans{background:linear-gradient(120deg,#fbefd5,#f5e4e9)}
+#start{background:linear-gradient(125deg,#e4f0ee,#f3edfa)}
+#book{background:linear-gradient(115deg,#e8f0d2,#f8e5cb)}
+.card,.panel,.step,.pbox{background:rgba(255,255,255,.94);border-color:rgba(24,49,45,.14)}
+#services .card:nth-child(1){border-top:4px solid #9abc5c}
+#services .card:nth-child(2){border-top:4px solid #dc9b58}
+#services .card:nth-child(3){border-top:4px solid #9b80d3}
+.pc.m{background:#f6d98a!important}.pc.t{background:#f4c8b8!important}.pc.f{background:#d8e7bb!important}.pc.c{background:#c2e9ed!important}
+@media(max-width:700px){.pz{opacity:.42;scale:.7}.hero>.pz{opacity:.55}.hero{overflow:hidden}.nav{background:#f9f6f0}}
+@media(prefers-reduced-motion:reduce){.pz{animation:none}}
 </style>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
@@ -276,5 +296,6 @@ set(lang);
 </script>
 </body>
 </html>
+
 
 
