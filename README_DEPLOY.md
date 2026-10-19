@@ -1,82 +1,36 @@
-# ALTIGRA — Visibility Gap Check
+# ALTIGRA Visibility Checker v2
 
-This branch (feature/elevate-services-visibility-check) contains:
-- Updated homepage copy with elevated Service Pillars
-- A standalone audit application: `visibility-check.html`
-- A Netlify serverless function scaffold: `netlify/functions/send-audit.js`
+Netlify deploys `main` from `dukesafi-beep/bench`. No package installation is needed. Node 22 runs the tests before publication. The root index remains the ALTIGRA landing page; `/visibility-check.html` opens the automatic checker. `/manual-check.html` preserves the manual checklist.
 
-This README explains how to deploy the site and enable the email delivery for the audit reports.
+## Working without credentials
 
----
+Public HTTPS website scans and comparisons work with no third-party API key. The scanner checks initial HTML, robots.txt and sitemap.xml. It reports evidence, unknown checks, timestamps and its measurement limitations. Reports can be downloaded as JSON or printed to PDF. When server email is not configured, the contact button opens a mail draft for the visitor to send.
 
-## Recommended quick deploy (Netlify)
-Netlify is the fastest way to enable the serverless mailer already included in this repo.
+## Optional Gemini discovery sample
 
-1. Create a Netlify site
-   - Go to https://app.netlify.com and "New site" → "Import from Git" → select `dukesafi-beep/bench`.
-   - Set the publish directory to `/` (this is a static site).
+Set these in Netlify project environment variables, scoped to Functions and Production, then redeploy:
 
-2. Add environment variables
-   - Netlify Dashboard → Site settings → Build & deploy → Environment → Environment variables
-   - Add these keys:
-     - `SENDGRID_API_KEY` = <your SendGrid API key>
-     - `FROM_EMAIL` = `info@altigra.be` (or the verified sender in SendGrid)
-   - Note: FROM_EMAIL must be a verified sender in your SendGrid account or the send will fail.
+- `GEMINI_API_KEY`: a Gemini API key. Never put keys in HTML, JavaScript, GitHub or reports.
+- `ENABLE_AI_VISIBILITY`: `true` to explicitly enable metered AI sampling.
+- `GEMINI_MODEL`: optional; defaults to `gemini-3.8-flash`.
 
-3. Deploy
-   - Trigger a deploy (Netlify will run an initial build). The serverless function will be deployed under `/.netlify/functions/send-audit`.
+The sample sends only service and city in the prompt. It does not tell Gemini the target business. The backend checks whether the exact business name appears in the answer and returns the full answer, prompt, model, date, grounding sources and search suggestions. Review identity matches manually. Failed or unconfigured requests have no visibility score. This is one Gemini API answer, not the Gemini consumer app, ChatGPT, Google Maps, AI Overviews or Google organic rankings. Grounding usage may incur Google API charges; set provider quotas before enabling production usage. No paid API calls were used for deployment tests.
 
-4. Test the flow
-   - Visit the deployed site URL (from Netlify).
-   - Open `/visibility-check.html`.
-   - Fill in your business name or URL, complete a few checks and click **Send audit to ALTIGRA**.
-   - Confirm receipt at both `info@altigra.be` and `safi@altigra.be`.
+## Optional report delivery
 
----
+Set `SENDGRID_API_KEY` and `FROM_EMAIL` (a verified SendGrid sender), then redeploy. Reports go only to `info@altigra.be` and `safi@altigra.be`. The UI detects configuration automatically. A successful API response is provider acceptance, not proof of inbox delivery. Verify receipt separately.
 
-## If you prefer Vercel
-- The same serverless logic can run on Vercel. You will need to adapt `netlify/functions/send-audit.js` to a Vercel serverless handler (or use the provided code with minimal changes) and set environment variables in the Vercel project settings. The frontend endpoint will be `/api/send-audit` on Vercel.
+## Security and limits
 
-## Formspree (no secrets)
-If you do not want to add SendGrid credentials, I can change the client to POST to Formspree or similar. That requires providing a Formspree form ID and has different email formatting/limitations.
+- Only HTTPS public hostnames using standard ports; credentials and literal IPs are rejected.
+- IPv4 DNS answers are checked; private/special ranges are rejected. Each request pins a validated address. Redirects are validated again. IPv6-only sites are not supported.
+- Maximum 1.5 MB response, four redirects, per-request timeouts, bounded input, per-IP throttling and short-lived bounded in-process caching.
+- Netlify code rate limits are declared for audit and email functions. Verify rate-limit validation in each deploy log. Per-instance throttling is an additional fallback, not an absolute global spend cap.
+- No browser-side API keys. Remote HTML is inspected as text; never executed. Source links allow HTTP/HTTPS only. Google-provided search suggestions render in a sandboxed iframe.
+- Scans cannot render JavaScript, authenticate to third-party sites, measure Core Web Vitals, confirm indexing, inspect all crawl rules or quantify backlink authority.
+- Do not make the project public until you have reviewed provider quotas and the intended use.
 
----
+## Validation
 
-## LocalStorage one-time submission behavior
-- The client implements a one-time submission guard using localStorage under key `vgc-v1-subs`.
-- The guard records a normalized business identifier (prefer `meUrl`, fallback to `meName`) with an ISO timestamp after a successful send. This prevents repeated sends from the same browser for the same business.
-- Important: localStorage is a UI-side guard only. For robust cross-device duplicate blocking, enable server-side checking (see notes below).
+`node --test audit.test.js` covers URL/IP validation, evidence parsing, HTTP validation, unavailable Gemini behavior, DNS pinning/private redirects, and mocked email provider failures. Provider mocks never send email or consume AI quota.
 
-## Server-side duplicate blocking (optional, recommended)
-- The Netlify function currently sends emails but does not persist the submission record server-side.
-- If you want robust enforcement of one-submission-per-business across devices, add a small persistent store (DynamoDB, Supabase, Netlify KV, or similar) and update the serverless function to check and record the normalized key before sending.
-
----
-
-## PR details (ready to open)
-- Branch: `feature/elevate-services-visibility-check`
-- PR title: `feat: elevate services and add Visibility Gap Check audit tool`
-- PR description (suggested):
-```
-This PR elevates the ALTIGRA service messaging and integrates a Visibility Gap Check audit tool.
-
-What changed:
-- Updated homepage copy and visual hierarchy (three Service Pillars: Hyper-Local SEO, High-Intent Google Ads, Infrastructure & Tracking)
-- Added `visibility-check.html` — interactive audit tool (single-file app)
-- Added serverless function scaffold `netlify/functions/send-audit.js` (SendGrid) to email audit reports to info@altigra.be and safi@altigra.be
-- Implemented client-side one-time submission guard (localStorage)
-
-Testing checklist:
-- [ ] Deploy branch to Netlify and set `SENDGRID_API_KEY` and `FROM_EMAIL`
-- [ ] Preview `/visibility-check.html` and run a sample audit
-- [ ] Click **Send audit to ALTIGRA** and confirm receipt at both mailboxes
-- [ ] Verify localStorage marks the business as submitted and the Send button is disabled after success
-- [ ] Confirm no console errors in browser devtools
-
-Notes:
-- The Netlify function requires `SENDGRID_API_KEY` and a verified `FROM_EMAIL` in SendGrid. We included a scaffold; replace or extend as needed for your hosting.
-```
-
----
-
-If you want I will now open the PR and include this checklist and a short QA report. If you prefer to run the deploy yourself first, add the environment variables on Netlify and tell me when ready — I will run the test and finish the PR.

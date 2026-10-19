@@ -1,0 +1,271 @@
+<!doctype html><html lang="en"><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Visibility Gap Check</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one working column. Setup, then a tri-state audit grid (you vs three rivals), then results that recompute on every click. */
+:root{
+  --bg:#F2F5F6; --surface:#FFFFFF; --ink:#14202A; --muted:#566673; --line:#D3DCE1;
+  --accent:#0B7A75; --on-accent:#FFFFFF; --soft:#E1F1F0; --warn:#A8460A; --warn-soft:#FBEBDD;
+  --good:#167A4A; --bad:#B42318;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --f-data:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D151B; --surface:#15202A; --ink:#E6EDF1; --muted:#93A4B1; --line:#2A3945;
+  --accent:#3CC4BC; --on-accent:#06201F; --soft:#12302F; --warn:#F0A04B; --warn-soft:#33240F;
+  --good:#5CCB93; --bad:#F27D72; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D151B; --surface:#15202A; --ink:#E6EDF1; --muted:#93A4B1; --line:#2A3945;
+  --accent:#3CC4BC; --on-accent:#06201F; --soft:#12302F; --warn:#F0A04B; --warn-soft:#33240F;
+  --good:#5CCB93; --bad:#F27D72; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5;
+  padding-block:24px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1,h2{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:30px;line-height:1.1}
+h2{font-size:20px}
+p{margin:0}
+.lede{color:var(--muted);max-width:62ch;margin-top:6px}
+section{display:flex;flex-direction:column;gap:12px;min-width:0}
+.sub{color:var(--muted);max-width:68ch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px}
+.banner{background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn);border-radius:6px;padding:10px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.banner span{flex:1;min-width:200px}
+.setup{display:grid;grid-template-columns:1fr 1.4fr;gap:16px}
+@media (max-width:760px){.setup{grid-template-columns:1fr}}
+.setup>div{min-width:0}
+.lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.fields{display:grid;gap:8px;margin-top:8px}
+input,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:7px 9px;width:100%;min-width:0}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.comp{display:grid;grid-template-columns:96px 1fr 1fr 96px;gap:6px;align-items:center;margin-top:8px}
+.comp .role{font-size:12px;color:var(--muted);font-weight:600}
+@media (max-width:640px){.comp{grid-template-columns:1fr 1fr}.comp .role{grid-column:1/-1;margin-top:6px}}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button.btn{font:inherit;font-weight:600;border-radius:4px;padding:8px 14px;border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);cursor:pointer}
+button.btn.ghost{background:transparent;color:var(--accent)}
+button.btn:disabled{opacity:.55;cursor:wait}
+#msg{color:var(--muted);min-height:20px}
+#msg.err{color:var(--bad)}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:620px}
+th,td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+thead th{font-size:12px;font-weight:600;vertical-align:bottom;background:var(--surface)}
+thead th .tag{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+thead th.me .tag{color:var(--accent)}
+tr.cat th{background:var(--soft);font-family:var(--f-display);font-size:13px;letter-spacing:0}
+tr.cat td{background:var(--soft);font-family:var(--f-data);font-size:12px;text-align:center}
+tbody td.s,thead th.s{text-align:center;width:104px}
+.item small{display:block;color:var(--muted);font-size:12px}
+button.c{width:34px;height:30px;border-radius:4px;border:1px solid var(--line);background:var(--bg);color:var(--muted);font:600 14px var(--f-data);cursor:pointer}
+button.c.y{background:var(--good);border-color:var(--good);color:#fff}
+button.c.n{background:transparent;border-color:var(--bad);color:var(--bad)}
+button.c.est{border-style:dashed;border-width:2px}
+button.c.y.est{background:transparent;color:var(--good)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:12px}
+.sc td.p{font-family:var(--f-data);text-align:center;background:linear-gradient(to right,var(--soft) var(--p),transparent var(--p))}
+.sc tr.tot td,.sc tr.tot th{font-weight:700;border-bottom:2px solid var(--ink)}
+.sc td.gapc{color:var(--warn);font-weight:700}
+.sc td.na{color:var(--muted);text-align:center}
+ol.gaps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+ol.gaps li{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 14px;display:grid;grid-template-columns:28px 1fr;gap:10px}
+ol.gaps .n{font:600 13px var(--f-data);color:var(--warn)}
+ol.gaps b{display:block}
+ol.gaps .who{color:var(--muted);font-size:12px}
+ol.gaps .fix{margin-top:4px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){.two{grid-template-columns:1fr}}
+.two>*{min-width:0}
+ul.plain{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.empty{color:var(--muted);font-style:italic}
+svg.mx{width:100%;height:auto;max-width:640px;display:block}
+svg.mx text{font-family:var(--f-body);font-size:11px;fill:var(--muted)}
+svg.mx .q{font-size:10px;letter-spacing:.06em;text-transform:uppercase}
+svg.mx .lab{fill:var(--ink);font-size:12px}
+svg.mx .lab.me{fill:var(--accent);font-weight:700}
+svg.mx .grid{stroke:var(--line);stroke-width:1}
+svg.mx .mid{stroke:var(--muted);stroke-width:1;stroke-dasharray:4 4}
+svg.mx .you{fill:var(--accent);stroke:var(--surface);stroke-width:2}
+svg.mx .them{fill:var(--surface);stroke:var(--ink);stroke-width:2}
+.note{font-size:12px;color:var(--muted);max-width:70ch}
+/* CTA banner */
+.cta{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:14px;border-radius:8px;background:linear-gradient(90deg,var(--accent),#005C3B);color:var(--on-accent);border:1px solid rgba(0,0,0,0.06)}
+.cta .cta-copy{font-weight:700}
+.cta .cta-actions{display:flex;gap:10px}
+.cta a.book{background:var(--on-accent);color:var(--accent);padding:10px 14px;border-radius:6px;text-decoration:none;font-weight:700;border:2px solid rgba(0,0,0,0.06)}
+.cta button.send{background:transparent;color:var(--on-accent);padding:10px 14px;border-radius:6px;border:2px solid rgba(255,255,255,0.12);font-weight:700;cursor:pointer}
+@media (prefers-reduced-motion:no-preference){button.c,button.btn{transition:background .12s,border-color .12s}}
+.submitted-overlay{background:rgba(255,255,255,0.9);border:1px solid var(--line);padding:12px;border-radius:8px;color:var(--muted);font-weight:600}
+</style>
+
+<main>
+  <header>
+    <h1>Visibility Gap Check</h1>
+    <p class="lede">Compare your business with a market leader, a direct rival and a budget option using a practical SEO checklist. The result lists your weakest points first.</p>
+  </header>
+
+  <div class="banner" id="banner" hidden>
+    <span>Example data is loaded so you can see how it works. Replace it with your own business and competitors.</span>
+    <button class="btn ghost" id="clear" type="button">Clear example</button>
+  </div>
+
+  <section>
+    <h2>1. Who is being compared</h2>
+    <div class="panel setup">
+      <div>
+        <div class="lbl">Your business</div>
+        <div class="fields">
+          <input id="meName" placeholder="Business name" autocomplete="off">
+          <input id="meUrl" placeholder="Website, e.g. yourshop.be" autocomplete="off">
+          <input id="kw" placeholder="Main search term, e.g. artisan bakery" autocomplete="off">
+          <input id="city" placeholder="Town or region" autocomplete="off">
+        </div>
+      </div>
+      <div>
+        <div class="lbl">Three competitors</div>
+        <div id="comps"></div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="suggest" type="button" hidden>Suggest competitors</button>
+      <button class="btn ghost" id="prefill" type="button" hidden>Pre-fill checks with estimates</button>
+      <span id="msg" role="status" aria-live="polite"></span>
+    </div>
+    <p class="note">Manual assessment: verify each check using the website, Google results and your own tools. This app does not retrieve live rankings, backlinks or AI mentions. Scores are checklist summaries, not Google ranking factors.</p>
+  </section>
+
+  <section>
+    <h2>2. Audit each site</h2>
+    <p class="sub">Open each site and its Google result, then click a box: once for yes, twice for no, three times to clear. Boxes left empty are left out of the scores, not counted as failures.</p>
+    <div class="legend">
+      <span>✓ yes</span><span>✗ no</span><span>– not checked</span><span>Dashed outline = unverified estimate</span>
+    </div>
+    <div class="scroll"><table id="grid"></table></div>
+  </section>
+
+  <section id="results">
+    <h2>3. Results</h2>
+    <div id="out"></div>
+  </section>
+
+  <!-- CTA banner: lead capture -->
+  <section>
+    <div class="panel cta" role="region" aria-label="Book Altigra to close your visibility gaps">
+      <div class="cta-copy">Want ALTIGRA to close these visibility gaps for your business?</div>
+      <div class="cta-actions"><a class="book" href="tel:+32472401505" aria-label="Call Altigra">Book a Free Strategy Call</a><button class="send" id="sendReport" type="button" aria-label="Send audit report to Altigra">Send audit to ALTIGRA</button></div>
+    </div>
+    <div id="submittedInfo" style="margin-top:10px"></div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+var CATS=[
+ {id:"rel",name:"Relevance and search intent",w:25},
+ {id:"q",name:"Content quality and trust",w:25},
+ {id:"auth",name:"Authority and backlinks",w:20},
+ {id:"tech",name:"Technical SEO and page experience",w:20},
+ {id:"sig",name:"User signals",w:10}
+];
+var ITEMS=[
+ {id:"r_title",cat:"rel",t:"Title tag has the main search term and the town",fix:"Rewrite the homepage title as the main term plus the town, then the brand, under 60 characters."},
+ {id:"r_h1",cat:"rel",t:"H1 heading says what the business is and where",fix:"Make the page's single H1 state the service and the place in plain words."},
+ {id:"r_meta",cat:"rel",t:"Meta description written to earn the click",fix:"Write a 140 to 155 character description for each key page, ending with a reason to click."},
+ {id:"r_pages",cat:"rel",t:"A separate page for each service, product or location",fix:"Give every service, product line or location its own page with its own title and H1."},
+ {id:"r_cover",cat:"rel",t:"Covers related questions (FAQ, menu or prices, how it works)",fix:"Add an FAQ and a clear price or menu page answering what customers ask before buying."},
+ {id:"q_orig",cat:"q",t:"Original photos and text, not stock or copied",fix:"Replace stock images and copied text with your own photos and descriptions."},
+ {id:"q_contact",cat:"q",t:"Address, phone and opening hours visible on every page",fix:"Put address, phone and opening hours in the footer of every page."},
+ {id:"q_reviews",cat:"q",t:"Customer reviews or testimonials shown on the site",fix:"Show real customer reviews on the homepage and key pages."},
+ {id:"q_about",cat:"q",t:"About page naming real people or credentials",fix:"Add an About page with the people behind the business, their experience and photos."},
+ {id:"q_fresh",cat:"q",t:"Content updated in the last 6 months",fix:"Publish or update something every few months: offers, news, seasonal pages."},
+ {id:"a_gbp",cat:"auth",t:"Google Business Profile claimed and collecting reviews",fix:"Claim the profile, complete every field and ask each customer for a review."},
+ {id:"a_dir",cat:"auth",t:"Listed in the main directories with identical details",fix:"List the business in the main directories and make name, address and phone identical everywhere."},
+ {id:"a_press",cat:"auth",t:"Mentioned or linked by local press, blogs or industry sites",fix:"Pitch local press, bloggers and industry sites; each link from a trusted site counts as a vote."},
+ {id:"a_links",cat:"auth",t:"10 or more different websites link to it",fix:"Earn links from suppliers, partners, event pages and local organisations."},
+ {id:"t_https",cat:"tech",t:"HTTPS, no browser security warning",fix:"Install an SSL certificate and redirect every http address to https."},
+ {id:"t_mobile",cat:"tech",t:"Works well on a phone",fix:"Make the layout responsive and check buttons and text on a real phone."},
+ {id:"t_speed",cat:"tech",t:"Main page loads in under 3 seconds on mobile",fix:"Compress images, remove unused scripts and re-test in PageSpeed Insights."},
+ {id:"t_crawl",cat:"tech",t:"robots.txt and sitemap.xml exist and block nothing important",fix:"Publish a sitemap.xml, reference it in robots.txt and submit it in Search Console."},
+ {id:"t_schema",cat:"tech",t:"Structured data present (LocalBusiness, product, FAQ)",fix:"Add accurate LocalBusiness structured data and validate it. FAQ rich results are generally restricted to authoritative government and health sites."},
+ {id:"s_rank",cat:"sig",t:"On page one of Google for the main search term",fix:"Focus the homepage and one landing page on the main term until they reach page one."},
+ {id:"s_rich",cat:"sig",t:"Search result shows stars, prices or other extras",fix:"Use only eligible structured data supported by the page. Google does not show self-serving LocalBusiness review stars; rich results are never guaranteed."},
+ {id:"s_brand",cat:"sig",t:"Searching the brand name shows the site first, with sub-links",fix:"Strengthen the brand name on the homepage and in the Business Profile."}
+];
+var ROLES=["Market leader","Direct rival","Budget option"];
+var PRICES=[["1","1 Budget"],["2","2 Low"],["3","3 Mid"],["4","4 High"],["5","5 Premium"]];
+var KEY="vgc-v1";
+var SUB_KEY=KEY+"-subs"; // submissions map stored in localStorage
+
+function code(str){var o={};ITEMS.forEach(function(it,i){var c=str.charAt(i);if(c==="y"||c==="n")o[it.id]={v:c,est:false};});return o;}
+function example(){return{
+ example:true,
+ me:{name:"Your business (example)",url:"",price:3},
+ kw:"neighbourhood bakery",city:"",
+ comps:[
+  {name:"Market leader (example)",url:"",price:5},
+  {name:"Direct rival (example)",url:"",price:3},
+  {name:"Budget option (example)",url:"",price:1}],
+ cells:[
+  code("nynnn"+"yynyn"+"yynn"+"yynyn"+"nny"),
+  code("yyyyy"+"nyyyy"+"yyyy"+"yynyy"+"yyy"),
+  code("yynyn"+"yyyyn"+"yynn"+"yyyyn"+"ynn"),
+  code("nnnnn"+"nynnn"+"ynnn"+"ynnnn"+"nnn")]
+};}
+function blank(){return{example:false,me:{name:"",url:"",price:3},kw:"",city:"",
+ comps:[{name:"",url:"",price:5},{name:"",url:"",price:3},{name:"",url:"",price:1}],cells:[{},{},{},{}]};}
+function load(){try{var r=localStorage.getItem(KEY);if(r){var s=JSON.parse(r);if(s&&s.cells&&s.cells.length===4)return s;}}catch(e){}return null;}
+var S=load()||example();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){} }
+function loadSubs(){try{var r=localStorage.getItem(SUB_KEY);if(r)return JSON.parse(r);}catch(e){}return {};}
+function saveSubs(m){try{localStorage.setItem(SUB_KEY,JSON.stringify(m));}catch(e){}
+}
+var SUBS=loadSubs();
+
+function esc(s){return String(s == null ? "" : s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+function el(id){return document.getElementById(id);}
+function entities(){return [S.me].concat(S.comps);}
+function score(col,cat){var items=ITEMS.filter(function(i){return !cat||i.cat===cat;});var checked=items.filter(function(i){var c=S.cells[col][i.id];return c&&!c.est&&(c.v==="y"||c.v==="n");});return {checked:checked.length,total:items.length,value:checked.length?Math.round(100*checked.filter(function(i){return S.cells[col][i.id].v==="y";}).length/checked.length):null};}
+function overall(col){var total=0,weight=0;CATS.forEach(function(cat){var v=score(col,cat.id);if(v.value!==null){total+=v.value*cat.w;weight+=cat.w;}});return weight?Math.round(total/weight):null;}
+function gaps(){return ITEMS.filter(function(i){return S.cells[0][i.id]&&S.cells[0][i.id].v==="n"&&!S.cells[0][i.id].est;}).map(function(i){var rivals=[];for(var c=1;c<4;c++){var cell=S.cells[c][i.id];if(cell&&cell.v==="y"&&!cell.est)rivals.push(entities()[c].name||ROLES[c-1]);}return {title:i.t,fix:i.fix,who:rivals.length?"Verified advantage: "+rivals.join(", "):"Improvement identified in your checklist",priority:CATS.find(function(cat){return cat.id===i.cat;}).w+rivals.length*10};}).sort(function(a,b){return b.priority-a.priority;});}
+function status(message,error){el("msg").textContent=message;el("msg").className=error?"err":"";}
+function renderSetup(){
+ el("banner").hidden=!S.example;
+ ["meName","meUrl","kw","city"].forEach(function(id){el(id).value=id==="meName"?S.me.name:id==="meUrl"?S.me.url:S[id];el(id).setAttribute("aria-label",{"meName":"Your business name","meUrl":"Your website","kw":"Main search term","city":"Town or region"}[id]);});
+ el("comps").innerHTML=S.comps.map(function(c,i){return '<div class="comp"><span class="role">'+ROLES[i]+'</span><input data-comp="'+i+'" data-field="name" aria-label="'+ROLES[i]+' name" placeholder="Business name" value="'+esc(c.name)+'"><input data-comp="'+i+'" data-field="url" aria-label="'+ROLES[i]+' website" placeholder="Website" value="'+esc(c.url)+'"><select data-comp="'+i+'" data-field="price" aria-label="'+ROLES[i]+' price">'+PRICES.map(function(p){return '<option value="'+p[0]+'"'+(Number(p[0])===Number(c.price)?' selected':'')+'>'+p[1]+'</option>';}).join("")+'</select></div>';}).join("");
+}
+function renderGrid(){
+ var names=entities();
+ el("grid").innerHTML='<caption class="note">Verified SEO checklist. Each button cycles through unchecked, yes and no.</caption><thead><tr><th scope="col">Check</th>'+names.map(function(e,i){return '<th scope="col" class="s '+(i===0?"me":"")+'"><span class="tag">'+(i===0?"Your business":ROLES[i-1])+'</span>'+esc(e.name||"Unnamed")+'</th>';}).join("")+'</tr></thead><tbody>'+CATS.map(function(cat){return '<tr class="cat"><th colspan="5" scope="colgroup">'+cat.name+'</th></tr>'+ITEMS.filter(function(it){return it.cat===cat.id;}).map(function(it){return '<tr><th scope="row" class="item">'+it.t+'</th>'+names.map(function(e,col){var c=S.cells[col][it.id]||{};var v=c.v;return '<td class="s"><button type="button" class="c '+(v||"")+(c.est?" est":"")+'" data-col="'+col+'" data-item="'+it.id+'" aria-label="'+esc((e.name||"Business "+(col+1))+": "+it.t+": "+(v==="y"?"yes":v==="n"?"no":"not checked"))+'">'+(v==="y"?"✓":v==="n"?"✗":"–")+'</button></td>';}).join("")+'</tr>';}).join("");}).join("")+'</tbody>';
+}
+function renderResults(){
+ var names=entities(), allGaps=gaps();
+ el("out").innerHTML='<p class="note">Scores use verified answers only. Compare coverage before comparing scores: a high score from a few checks is incomplete. Category weights are ALTIGRA methodology, not Google weights.</p><div class="scroll"><table class="sc"><caption>Checklist results and assessment coverage</caption><thead><tr><th>Business</th><th>Score</th><th>Verified checks</th></tr></thead><tbody>'+names.map(function(e,i){var coverage=score(i);return '<tr><th scope="row">'+esc(e.name||"Unnamed")+'</th><td>'+ (overall(i)===null?"Not assessed":overall(i)+" / 100")+'</td><td>'+coverage.checked+' / '+coverage.total+'</td></tr>';}).join("")+'</tbody></table></div><h3>Priority improvements</h3>'+(allGaps.length?'<ol class="gaps">'+allGaps.map(function(g,i){return '<li><span class="n">'+(i+1)+'</span><div><b>'+esc(g.title)+'</b><div class="who">'+esc(g.who)+'</div><p class="fix">'+esc(g.fix)+'</p></div></li>';}).join("")+'</ol>':'<p class="empty">Mark a verified check as “no” to see an improvement plan.</p>');
+ el("sendReport").disabled=S.example||!score(0).checked||!(S.me.name.trim()||S.me.url.trim());
+ el("submittedInfo").textContent=S.example?"Example report — clear the example to start your own assessment.":"Your assessment is saved in this browser when storage is available.";
+}
+function render(){renderSetup();renderGrid();renderResults();}
+function report(){return {business:S.me,kw:S.kw,city:S.city,timestamp:new Date().toISOString(),method:"Manual verified checklist; not a live ranking or AI visibility measurement",scores:entities().map(function(e,i){return {name:e.name,overall:overall(i),coverage:score(i),cats:CATS.map(function(c){return score(i,c.id).value;})};}),catOrder:CATS,gaps:gaps(),checks:S.cells};}
+function changed(){save();renderGrid();renderResults();}
+["meName","meUrl","kw","city"].forEach(function(id){el(id).addEventListener("input",function(){if(id==="meName")S.me.name=this.value;else if(id==="meUrl")S.me.url=this.value;else S[id]=this.value;changed();});});
+el("comps").addEventListener("input",function(event){var t=event.target;if(t.dataset.comp!==undefined){S.comps[Number(t.dataset.comp)][t.dataset.field]=t.dataset.field==="price"?Number(t.value):t.value;changed();}});
+el("grid").addEventListener("click",function(event){var b=event.target.closest("button[data-item]");if(!b)return;var col=Number(b.dataset.col),id=b.dataset.item,c=S.cells[col][id];var next=!c||c.est?"y":c.v==="y"?"n":null;if(next)S.cells[col][id]={v:next,est:false};else delete S.cells[col][id];changed();});
+el("clear").addEventListener("click",function(){S=blank();save();render();status("Ready for your assessment.");});
+var exportButton=document.createElement("button");exportButton.type="button";exportButton.className="btn ghost";exportButton.textContent="Download report (JSON)";el("msg").before(exportButton);
+exportButton.addEventListener("click",function(){var blob=new Blob([JSON.stringify(report(),null,2)],{type:"application/json"});var url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="altigra-visibility-report.json";a.click();setTimeout(function(){URL.revokeObjectURL(url);},1000);});
+el("sendReport").addEventListener("click",async function(){
+ if(S.example||!score(0).checked)return;
+ this.disabled=true;status("Sending your report…");
+ try{var controller=new AbortController(),timer=setTimeout(function(){controller.abort();},15000);var response;try{response=await fetch("/.netlify/functions/send-audit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(report()),signal:controller.signal});}finally{clearTimeout(timer);}
+ if(!response.ok)throw new Error(response.status===503?"Email delivery is not configured yet. Download your report instead.":"The report could not be sent. Please download it and contact ALTIGRA.");
+ var result=await response.json();if(!result.ok)throw new Error("Email delivery was not confirmed.");
+ status("Report sent to ALTIGRA.");}catch(error){status(error.name==="AbortError"?"Sending timed out. Delivery is unconfirmed; download your report.":error.message,true);}finally{renderResults();}
+});
+try{if(!S.me||!Array.isArray(S.comps)||S.comps.length!==3||!Array.isArray(S.cells)||S.cells.some(function(c){return !c||typeof c!=="object";}))S=blank();render();}catch(error){S=blank();render();status("Saved data could not be restored. Started a fresh assessment.",true);}
+})();
+</script>
+</body></html>
+
