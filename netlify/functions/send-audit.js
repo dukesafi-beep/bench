@@ -15,7 +15,8 @@ exports.handler = async (event) => {
   const controller=new AbortController();
   const timer=setTimeout(()=>controller.abort(),10000);
   try {
-    const response=await fetch('https://api.sendgrid.com/v3/mail/send',{method:'POST',signal:controller.signal,headers:{Authorization:'Bearer '+process.env.SENDGRID_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({personalizations:[{to:[{email:'info@altigra.be'},{email:'safi@altigra.be'}]}],from:{email:process.env.FROM_EMAIL},subject,content:[{type:'text/plain',value:'Manual checklist assessment. These are user-entered observations, not independently measured rankings.\n\n'+JSON.stringify(body,null,2)}]})});
+    const response=await fetch('https://api.sendgrid.com/v3/mail/send',{method:'POST',signal:controller.signal,headers:{Authorization:'Bearer '+process.env.SENDGRID_API_KEY,'Content-Type':'application/json'},body:JSON.stringify({personalizations:[{to:[{email:'info@altigra.be'},{email:'safi@altigra.be'}]}],from:{email:process.env.FROM_EMAIL},subject,content:[{type:'text/plain',value:'ALTIGRA assessment. Technical HTML checks and optional AI samples are not independently verified Google rankings. Manual answers remain user-supplied.\n\n'+JSON.stringify(body,null,2)}]})});
     return response.ok ? reply(200,{ok:true}) : reply(502,{error:'Email provider could not accept report'});
   } catch {return reply(502,{error:'Email delivery unavailable'});} finally {clearTimeout(timer);}
 };
+exports.config={rateLimit:{windowLimit:5,windowSize:60,aggregateBy:['ip','domain']}};
