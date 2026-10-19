@@ -1,0 +1,454 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Visibility Gap Check</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one working column. Setup, then a tri-state audit grid (you vs three rivals), then results that recompute on every click. */
+:root{
+  --bg:#F2F5F6; --surface:#FFFFFF; --ink:#14202A; --muted:#566673; --line:#D3DCE1;
+  --accent:#0B7A75; --on-accent:#FFFFFF; --soft:#E1F1F0; --warn:#A8460A; --warn-soft:#FBEBDD;
+  --good:#167A4A; --bad:#B42318;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --f-data:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D151B; --surface:#15202A; --ink:#E6EDF1; --muted:#93A4B1; --line:#2A3945;
+  --accent:#3CC4BC; --on-accent:#06201F; --soft:#12302F; --warn:#F0A04B; --warn-soft:#33240F;
+  --good:#5CCB93; --bad:#F27D72; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D151B; --surface:#15202A; --ink:#E6EDF1; --muted:#93A4B1; --line:#2A3945;
+  --accent:#3CC4BC; --on-accent:#06201F; --soft:#12302F; --warn:#F0A04B; --warn-soft:#33240F;
+  --good:#5CCB93; --bad:#F27D72; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5;
+  padding-block:24px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1,h2{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:30px;line-height:1.1}
+h2{font-size:20px}
+p{margin:0}
+.lede{color:var(--muted);max-width:62ch;margin-top:6px}
+section{display:flex;flex-direction:column;gap:12px;min-width:0}
+.sub{color:var(--muted);max-width:68ch}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px}
+.banner{background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn);border-radius:6px;padding:10px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.banner span{flex:1;min-width:200px}
+.setup{display:grid;grid-template-columns:1fr 1.4fr;gap:16px}
+@media (max-width:760px){.setup{grid-template-columns:1fr}}
+.setup>div{min-width:0}
+.lbl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.fields{display:grid;gap:8px;margin-top:8px}
+input,select{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:7px 9px;width:100%;min-width:0}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.comp{display:grid;grid-template-columns:96px 1fr 1fr 96px;gap:6px;align-items:center;margin-top:8px}
+.comp .role{font-size:12px;color:var(--muted);font-weight:600}
+@media (max-width:640px){.comp{grid-template-columns:1fr 1fr}.comp .role{grid-column:1/-1;margin-top:6px}}
+.actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+button.btn{font:inherit;font-weight:600;border-radius:4px;padding:8px 14px;border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);cursor:pointer}
+button.btn.ghost{background:transparent;color:var(--accent)}
+button.btn:disabled{opacity:.55;cursor:wait}
+#msg{color:var(--muted);min-height:20px}
+#msg.err{color:var(--bad)}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:620px}
+th,td{padding:7px 10px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+thead th{font-size:12px;font-weight:600;vertical-align:bottom;background:var(--surface)}
+thead th .tag{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+thead th.me .tag{color:var(--accent)}
+tr.cat th{background:var(--soft);font-family:var(--f-display);font-size:13px;letter-spacing:0}
+tr.cat td{background:var(--soft);font-family:var(--f-data);font-size:12px;text-align:center}
+tbody td.s,thead th.s{text-align:center;width:104px}
+.item small{display:block;color:var(--muted);font-size:12px}
+button.c{width:34px;height:30px;border-radius:4px;border:1px solid var(--line);background:var(--bg);color:var(--muted);font:600 14px var(--f-data);cursor:pointer}
+button.c.y{background:var(--good);border-color:var(--good);color:#fff}
+button.c.n{background:transparent;border-color:var(--bad);color:var(--bad)}
+button.c.est{border-style:dashed;border-width:2px}
+button.c.y.est{background:transparent;color:var(--good)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:12px}
+.sc td.p{font-family:var(--f-data);text-align:center;background:linear-gradient(to right,var(--soft) var(--p),transparent var(--p))}
+.sc tr.tot td,.sc tr.tot th{font-weight:700;border-bottom:2px solid var(--ink)}
+.sc td.gapc{color:var(--warn);font-weight:700}
+.sc td.na{color:var(--muted);text-align:center}
+ol.gaps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+ol.gaps li{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:12px 14px;display:grid;grid-template-columns:28px 1fr;gap:10px}
+ol.gaps .n{font:600 13px var(--f-data);color:var(--warn)}
+ol.gaps b{display:block}
+ol.gaps .who{color:var(--muted);font-size:12px}
+ol.gaps .fix{margin-top:4px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){.two{grid-template-columns:1fr}}
+.two>*{min-width:0}
+ul.plain{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.empty{color:var(--muted);font-style:italic}
+svg.mx{width:100%;height:auto;max-width:640px;display:block}
+svg.mx text{font-family:var(--f-body);font-size:11px;fill:var(--muted)}
+svg.mx .q{font-size:10px;letter-spacing:.06em;text-transform:uppercase}
+svg.mx .lab{fill:var(--ink);font-size:12px}
+svg.mx .lab.me{fill:var(--accent);font-weight:700}
+svg.mx .grid{stroke:var(--line);stroke-width:1}
+svg.mx .mid{stroke:var(--muted);stroke-width:1;stroke-dasharray:4 4}
+svg.mx .you{fill:var(--accent);stroke:var(--surface);stroke-width:2}
+svg.mx .them{fill:var(--surface);stroke:var(--ink);stroke-width:2}
+.note{font-size:12px;color:var(--muted);max-width:70ch}
+/* CTA banner */
+.cta{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:14px;border-radius:8px;background:linear-gradient(90deg,var(--accent),#005C3B);color:var(--on-accent);border:1px solid rgba(0,0,0,0.06)}
+.cta .cta-copy{font-weight:700}
+.cta .cta-actions{display:flex;gap:10px}
+.cta a.book{background:var(--on-accent);color:var(--accent);padding:10px 14px;border-radius:6px;text-decoration:none;font-weight:700;border:2px solid rgba(0,0,0,0.06)}
+@media (prefers-reduced-motion:no-preference){button.c,button.btn{transition:background .12s,border-color .12s}}
+</style>
+
+<main>
+  <header>
+    <h1>Visibility Gap Check</h1>
+    <p class="lede">Compare your business with a market leader, a direct rival and a budget option across the five things search engines weigh. The result lists your weakest points first.</p>
+  </header>
+
+  <div class="banner" id="banner" hidden>
+    <span>Example data is loaded so you can see how it works. Replace it with your own business and competitors.</span>
+    <button class="btn ghost" id="clear" type="button">Clear example</button>
+  </div>
+
+  <section>
+    <h2>1. Who is being compared</h2>
+    <div class="panel setup">
+      <div>
+        <div class="lbl">Your business</div>
+        <div class="fields">
+          <input id="meName" placeholder="Business name" autocomplete="off">
+          <input id="meUrl" placeholder="Website, e.g. yourshop.be" autocomplete="off">
+          <input id="kw" placeholder="Main search term, e.g. artisan bakery" autocomplete="off">
+          <input id="city" placeholder="Town or region" autocomplete="off">
+        </div>
+      </div>
+      <div>
+        <div class="lbl">Three competitors</div>
+        <div id="comps"></div>
+      </div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="suggest" type="button" hidden>Suggest competitors</button>
+      <button class="btn ghost" id="prefill" type="button" hidden>Pre-fill checks with estimates</button>
+      <span id="msg" role="status" aria-live="polite"></span>
+    </div>
+    <p class="note">Claude can propose competitors and guess some checks from general knowledge, but it cannot open websites. Treat its answers as drafts: every guess shows a dashed outline until you click it to confirm.</p>
+  </section>
+
+  <section>
+    <h2>2. Audit each site</h2>
+    <p class="sub">Open each site and its Google result, then click a box: once for yes, twice for no, three times to clear. Boxes left empty are left out of the scores, not counted as failures.</p>
+    <div class="legend">
+      <span>✓ yes</span><span>✗ no</span><span>– not checked</span><span>Dashed outline = Claude's unverified guess</span>
+    </div>
+    <div class="scroll"><table id="grid"></table></div>
+  </section>
+
+  <section id="results">
+    <h2>3. Results</h2>
+    <div id="out"></div>
+  </section>
+
+  <!-- CTA banner: lead capture -->
+  <section>
+    <div class="panel cta" role="region" aria-label="Book Altigra to close your visibility gaps">
+      <div class="cta-copy">Want ALTIGRA to close these visibility gaps for your business?</div>
+      <div class="cta-actions"><a class="book" href="tel:+32472401505">Book a Free Strategy Call</a></div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function(){
+var CATS=[
+ {id:"rel",name:"Relevance and search intent",w:25},
+ {id:"q",name:"Content quality and trust",w:25},
+ {id:"auth",name:"Authority and backlinks",w:20},
+ {id:"tech",name:"Technical SEO and page experience",w:20},
+ {id:"sig",name:"User signals",w:10}
+];
+var ITEMS=[
+ {id:"r_title",cat:"rel",t:"Title tag has the main search term and the town",fix:"Rewrite the homepage title as the main term plus the town, then the brand, under 60 characters."},
+ {id:"r_h1",cat:"rel",t:"H1 heading says what the business is and where",fix:"Make the page's single H1 state the service and the place in plain words."},
+ {id:"r_meta",cat:"rel",t:"Meta description written to earn the click",fix:"Write a 140 to 155 character description for each key page, ending with a reason to click."},
+ {id:"r_pages",cat:"rel",t:"A separate page for each service, product or location",fix:"Give every service, product line or location its own page with its own title and H1."},
+ {id:"r_cover",cat:"rel",t:"Covers related questions (FAQ, menu or prices, how it works)",fix:"Add an FAQ and a clear price or menu page answering what customers ask before buying."},
+ {id:"q_orig",cat:"q",t:"Original photos and text, not stock or copied",fix:"Replace stock images and copied text with your own photos and descriptions."},
+ {id:"q_contact",cat:"q",t:"Address, phone and opening hours visible on every page",fix:"Put address, phone and opening hours in the footer of every page."},
+ {id:"q_reviews",cat:"q",t:"Customer reviews or testimonials shown on the site",fix:"Show real customer reviews on the homepage and key pages."},
+ {id:"q_about",cat:"q",t:"About page naming real people or credentials",fix:"Add an About page with the people behind the business, their experience and photos."},
+ {id:"q_fresh",cat:"q",t:"Content updated in the last 6 months",fix:"Publish or update something every few months: offers, news, seasonal pages."},
+ {id:"a_gbp",cat:"auth",t:"Google Business Profile claimed and collecting reviews",fix:"Claim the profile, complete every field and ask each customer for a review."},
+ {id:"a_dir",cat:"auth",t:"Listed in the main directories with identical details",fix:"List the business in the main directories and make name, address and phone identical everywhere."},
+ {id:"a_press",cat:"auth",t:"Mentioned or linked by local press, blogs or industry sites",fix:"Pitch local press, bloggers and industry sites; each link from a trusted site counts as a vote."},
+ {id:"a_links",cat:"auth",t:"10 or more different websites link to it",fix:"Earn links from suppliers, partners, event pages and local organisations."},
+ {id:"t_https",cat:"tech",t:"HTTPS, no browser security warning",fix:"Install an SSL certificate and redirect every http address to https."},
+ {id:"t_mobile",cat:"tech",t:"Works well on a phone",fix:"Make the layout responsive and check buttons and text on a real phone."},
+ {id:"t_speed",cat:"tech",t:"Main page loads in under 3 seconds on mobile",fix:"Compress images, remove unused scripts and re-test in PageSpeed Insights."},
+ {id:"t_crawl",cat:"tech",t:"robots.txt and sitemap.xml exist and block nothing important",fix:"Publish a sitemap.xml, reference it in robots.txt and submit it in Search Console."},
+ {id:"t_schema",cat:"tech",t:"Structured data present (LocalBusiness, product, FAQ)",fix:"Add LocalBusiness and FAQ structured data and validate it with Google's Rich Results Test."},
+ {id:"s_rank",cat:"sig",t:"On page one of Google for the main search term",fix:"Focus the homepage and one landing page on the main term until they reach page one."},
+ {id:"s_rich",cat:"sig",t:"Search result shows stars, prices or other extras",fix:"Add review and price markup so the result stands out and earns more clicks."},
+ {id:"s_brand",cat:"sig",t:"Searching the brand name shows the site first, with sub-links",fix:"Strengthen the brand name on the homepage and in the Business Profile."}
+];
+var ROLES=["Market leader","Direct rival","Budget option"];
+var PRICES=[["1","1 Budget"],["2","2 Low"],["3","3 Mid"],["4","4 High"],["5","5 Premium"]];
+var KEY="vgc-v1";
+
+function code(str){var o={};ITEMS.forEach(function(it,i){var c=str.charAt(i);if(c==="y"||c==="n")o[it.id]={v:c,est:false};});return o;}
+function example(){return{
+ example:true,
+ me:{name:"Your business (example)",url:"",price:3},
+ kw:"neighbourhood bakery",city:"",
+ comps:[
+  {name:"Market leader (example)",url:"",price:5},
+  {name:"Direct rival (example)",url:"",price:3},
+  {name:"Budget option (example)",url:"",price:1}],
+ cells:[
+  code("nynnn"+"yynyn"+"yynn"+"yynyn"+"nny"),
+  code("yyyyy"+"nyyyy"+"yyyy"+"yynyy"+"yyy"),
+  code("yynyn"+"yyyyn"+"yynn"+"yyyyn"+"ynn"),
+  code("nnnnn"+"nynnn"+"ynnn"+"ynnnn"+"nnn")]
+};}
+function blank(){return{example:false,me:{name:"",url:"",price:3},kw:"",city:"",
+ comps:[{name:"",url:"",price:5},{name:"",url:"",price:3},{name:"",url:"",price:1}],cells:[{},{},{},{}]};}
+function load(){try{var r=localStorage.getItem(KEY);if(r){var s=JSON.parse(r);if(s&&s.cells&&s.cells.length===4)return s;}}catch(e){}return null;}
+var S=load()||example();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){} }
+function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
+var $=function(id){return document.getElementById(id);};
+
+function name(i){return i===0?(S.me.name||"Your business"):(S.comps[i-1].name||ROLES[i-1]);}
+function cell(i,id){return S.cells[i][id];}
+function pct(i,cat){var a=0,y=0;ITEMS.forEach(function(it){if(it.cat!==cat.id)return;var c=cell(i,it.id);if(c){a++;if(c.v==="y")y++;}});return a?Math.round(y/a*100):null;}
+function overall(i){var w=0,s=0;CATS.forEach(function(c){var p=pct(i,c);if(p!==null){w+=c.w;s+=p*c.w;}});return w?Math.round(s/w):null;}
+function answered(i){return ITEMS.filter(function(it){return !!cell(i,it.id);}).length;}
+function catOf(id){return CATS.filter(function(c){return c.id===id;})[0];}
+
+/* ---------- setup inputs ---------- */
+function buildSetup(){
+  $("meName").value=S.me.name;$("meUrl").value=S.me.url;$("kw").value=S.kw;$("city").value=S.city;
+  var h="";
+  S.comps.forEach(function(c,i){
+    h+='<div class="comp"><div class="role">'+ROLES[i]+'</div>'+
+      '<input id="cn'+i+'" placeholder="Name" value="'+esc(c.name)+'" autocomplete="off">'+
+      '<input id="cu'+i+'" placeholder="Website" value="'+esc(c.url)+'" autocomplete="off">'+
+      '<select id="cp'+i+'" aria-label="Price tier of '+ROLES[i]+'">'+
+      PRICES.map(function(p){return '<option value="'+p[0]+'"'+(String(c.price)===p[0]?" selected":"")+'>'+p[1]+'</option>';}).join("")+
+      '</select></div>';
+  });
+  h+='<div class="comp"><div class="role">Your price tier</div><select id="mp" aria-label="Your price tier" style="grid-column:2/3">'+
+     PRICES.map(function(p){return '<option value="'+p[0]+'"'+(String(S.me.price)===p[0]?" selected":"")+'>'+p[1]+'</option>';}).join("")+'</select></div>';
+  $("comps").innerHTML=h;
+  $("banner").hidden=!S.example;
+}
+function bindSetup(){
+  function upd(){
+    S.me.name=$("meName").value;S.me.url=$("meUrl").value;S.kw=$("kw").value;S.city=$("city").value;S.me.price=+$("mp").value;
+    S.comps.forEach(function(c,i){c.name=$("cn"+i).value;c.url=$("cu"+i).value;c.price=+$("cp"+i).value;});
+    save();renderAll();
+  }
+  ["meName","meUrl","kw","city"].forEach(function(id){$(id).addEventListener("input",upd);});
+  $("comps").addEventListener("input",upd);
+  $("comps").addEventListener("change",upd);
+}
+
+/* ---------- audit grid ---------- */
+function renderGrid(){
+  var h="<thead><tr><th>Check</th>";
+  for(var i=0;i<4;i++)h+='<th class="s'+(i===0?" me":"")+'"><span class="tag">'+(i===0?"You":ROLES[i-1])+'</span>'+esc(name(i))+'</th>';
+  h+="</tr></thead><tbody>";
+  CATS.forEach(function(cat){
+    h+='<tr class="cat"><th>'+cat.name+'</th>';
+    for(var i=0;i<4;i++){var p=pct(i,cat);h+='<td>'+(p===null?"–":p+"%")+'</td>';} 
+    h+='</tr>';
+    ITEMS.filter(function(it){return it.cat===cat.id;}).forEach(function(it){
+      h+='<tr><td class="item">'+it.t+'</td>';
+      for(var i=0;i<4;i++){
+        var c=cell(i,it.id);var cls="c"+(c?" "+c.v:"")+(c&&c.est?" est":"");
+        var sym=c?(c.v==="y"?"✓":"✗"):"–";
+        h+='<td class="s"><button type="button" class="'+cls+'" data-s="'+i+'" data-id="'+it.id+'" aria-label="'+esc(it.t)+', '+esc(name(i))+': '+(c?(c.v==="y"?"yes":"no")+(c.est?", unverified guess":""):"not checked")+'">'+sym+'</button></td>';
+      }
+      h+='</tr>';
+    });
+  });
+  $("grid").innerHTML=h+"</tbody>";
+}
+function onCell(e){
+  var b=e.target.closest("button.c");if(!b)return;
+  var i=+b.dataset.s,id=b.dataset.id,c=S.cells[i][id];
+  if(!c)S.cells[i][id]={v:"y",est:false};
+  else if(c.est)c.est=false;
+  else if(c.v==="y")c.v="n";
+  else delete S.cells[i][id];
+  S.example=S.example;save();renderAll();
+}
+
+/* ---------- results ---------- */
+function bestRival(cat){var b=null;for(var i=1;i<4;i++){var p=pct(i,cat);if(p!==null&&(b===null||p>b))b=p;}return b;}
+function renderResults(){
+  var out="";
+  var anyMe=answered(0)>0;
+  if(!anyMe){$("out").innerHTML='<p class="empty">Check at least a few boxes for your own site to see results.</p>';return;}
+  /* scorecard */
+  out+='<div class="scroll"><table class="sc"><thead><tr><th>Score out of 100</th>';
+  for(var i=0;i<4;i++)out+='<th class="s'+(i===0?" me":"")+'"><span class="tag">'+(i===0?"You":ROLES[i-1])+'</span>'+esc(name(i))+'</th>';
+  out+='</tr></thead><tbody><tr class="tot"><th>Overall visibility</th>';
+  for(i=0;i<4;i++){var o=overall(i);out+=o===null?'<td class="na">–</td>':'<td class="p" style="--p:'+o+'%">'+o+'</td>';} 
+  out+='</tr>';
+  CATS.forEach(function(cat){
+    out+='<tr><th scope="row" style="font-weight:500">'+cat.name+' <span style="color:var(--muted)">('+cat.w+'%)</span></th>';
+    var br=bestRival(cat);
+    for(var i=0;i<4;i++){
+      var p=pct(i,cat);
+      if(p===null){out+='<td class="na">–</td>';continue;}
+      var gap=(i===0&&br!==null&&br-p>=15);
+      out+='<td class="p'+(gap?" gapc":"")+'" style="--p:'+p+'%">'+p+(gap?" ▼":"")+'</td>';
+    }
+    out+='</tr>';
+  });
+  out+='<tr><th scope="row" style="font-weight:500">Checks answered</th>';
+  for(i=0;i<4;i++)out+='<td class="na">'+answered(i)+' / '+ITEMS.length+'</td>';
+  out+='</tr></tbody></table></div><p class="note">▼ marks a category where a competitor scores 15 or more points above you. Scores use only the boxes you answered, so compare sites with similar numbers answered.</p>';
+
+  /* gaps */
+  var gaps=[];
+  ITEMS.forEach(function(it){
+    var m=cell(0,it.id);if(!m||m.v!=="n")return;
+    var have=[];for(var i=1;i<4;i++){var c=cell(i,it.id);if(c&&c.v==="y")have.push(i);} 
+    gaps.push({it:it,have:have,score:catOf(it.cat).w*(have.length||0.5)});
+  });
+  gaps.sort(function(a,b){return b.score-a.score;});
+  out+='<h2 style="margin-top:20px">Your weakest points, ranked</h2>';
+  if(!gaps.length)out+='<p class="empty">No failed checks on your side yet.</p>';
+  else{
+    out+='<ol class="gaps">';
+    gaps.slice(0,8).forEach(function(g,k){
+      var who=g.have.length?g.have.map(function(i){return esc(name(i));}).join(", ")+" "+(g.have.length>1?"have":"has")+" this":"No competitor has this yet, so it is an open opportunity";
+      out+='<li><span class="n">'+(k+1)+'</span><div><b>'+g.it.t+'</b><span class="who">'+catOf(g.it.cat).name+' · '+who+'</span><div class="fix">'+g.it.fix+'</div></div></li>';
+    });
+    out+='</ol>';
+    if(gaps.length>8)out+='<p class="note">'+(gaps.length-8)+' more failed checks are not shown.</p>';
+  }
+  var unk=ITEMS.length-answered(0);
+  if(unk)out+='<p class="note">'+unk+' checks on your own site are still empty and are not counted.</p>';
+
+  /* strengths + pitch */
+  var str=ITEMS.filter(function(it){var m=cell(0,it.id);if(!m||m.v!=="y")return false;for(var i=1;i<4;i++){var c=cell(i,it.id);if(c&&c.v==="n")return true;}return false;});
+  var pitch=[];
+  for(i=1;i<4;i++){
+    var best=null,bd=0;
+    CATS.forEach(function(cat){var a=pct(i,cat),b=pct(0,cat);if(a!==null&&b!==null&&a-b>bd){bd=a-b;best=cat;}});
+    var miss=str.filter(function(it){var c=cell(i,it.id);return c&&c.v==="n";})[0];
+    if(best||miss){
+      var line="<b>"+esc(name(i))+"</b> "+(best?"is ahead on "+best.name.toLowerCase()+" ("+pct(i,best)+" against your "+pct(0,best)+")":"is not clearly ahead of you anywhere");
+      line+=miss?", but it does not match you on: "+miss.t.charAt(0).toLowerCase()+miss.t.slice(1)+".":".";
+      pitch.push(line);
+    }
+  }
+  out+='<div class="two" style="margin-top:20px"><div><h2>Where you already lead</h2>';
+  out+=str.length?'<ul class="plain" style="margin-top:8px">'+str.slice(0,6).map(function(it){return "<li>"+it.t+"</li>";}).join("")+'</ul>':'<p class="empty" style="margin-top:8px">No check yet where you pass and a competitor fails.</p>';
+  out+='</div><div><h2>Pitch framing</h2><p class="note" style="margin:6px 0 8px">Gaps stated as what a rival misses, not as criticism.</p>';
+  out+=pitch.length?'<ul class="plain">'+pitch.map(function(p){return "<li>"+p+"</li>";}).join(""):'<p class="empty">Answer more competitor checks to generate lines.</p>';
+  out+='</div></div>';
+
+  /* matrix */
+  out+='<h2 style="margin-top:20px">Positioning map</h2><p class="sub">Price tier across, visibility score up. Set the price tiers in step 1.</p>'+matrix();
+  $("out").innerHTML=out;
+}
+function matrix(){
+  var W=600,H=360,l=52,r=24,t=18,b=48,pw=W-l-r,ph=H-t-b;
+  function X(p){return l+(p-1)/4*pw;}function Y(s){return t+(1-s/100)*ph;}
+  var s='<svg class="mx" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Positioning map of price tier against visibility score">';
+  for(var p=1;p<=5;p++){s+='<line class="grid" x1="'+X(p)+'" y1="'+t+'" x2="'+X(p)+'" y2="'+(t+ph)+'"/><text x="'+X(p)+'" y="'+(t+ph+16)+'" text-anchor="middle">'+p+'</text>';} 
+  [0,25,50,75,100].forEach(function(v){s+='<line class="grid" x1="'+l+'" y1="'+Y(v)+'" x2="'+(l+pw)+'" y2="'+Y(v)+'"/><text x="'+(l-8)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+v+'</text>';});
+  s+='<line class="mid" x1="'+X(3)+'" y1="'+t+'" x2="'+X(3)+'" y2="'+(t+ph)+'"/><line class="mid" x1="'+l+'" y1="'+Y(50)+'" x2="'+(l+pw)+'" y2="'+Y(50)+'"/>';
+  s+='<text class="q" x="'+(l+8)+'" y="'+(t+14)+'">Strong and low cost</text><text class="q" x="'+(l+pw-8)+'" y="'+(t+14)+'" text-anchor="end">Strong and high cost</text>';
+  s+='<text class="q" x="'+(l+8)+'" y="'+(t+ph-8)+'">Weak and low cost</text><text class="q" x="'+(l+pw-8)+'" y="'+(t+ph-8)+'" text-anchor="end">Weak and high cost</text>';
+  s+='<text x="'+(l+pw/2)+'" y="'+(H-6)+'" text-anchor="middle">Price tier (1 budget, 5 premium)</text>';
+  s+='<text transform="translate(14 '+(t+ph/2)+') rotate(-90)" text-anchor="middle">Visibility score</text>';
+  var pts=[];
+  for(var i=0;i<4;i++){var o=overall(i);if(o===null)continue;var pr=i===0?S.me.price:S.comps[i-1].price;pts.push({i:i,x:X(pr),y:Y(o)});} 
+  pts.forEach(function(pt,k){
+    var dy=-12;pts.forEach(function(q,j){if(j<k&&Math.abs(q.x-pt.x)<90&&Math.abs(q.y-pt.y)<18)dy=18;});
+    var nm=name(pt.i);if(nm.length>22)nm=nm.slice(0,21)+"…";
+    var end=pt.x>W-150;
+    s+='<circle class="'+(pt.i===0?"you":"them")+'" cx="'+pt.x+'" cy="'+pt.y+'" r="'+(pt.i===0?9:7)+'"/>';
+    s+='<text class="lab'+(pt.i===0?" me":"")+'" x="'+(pt.x+(end?-14:14))+'" y="'+(pt.y+dy+(dy<0?4:0))+'" text-anchor="'+(end?"end":"start")+'">'+esc(nm)+'</text>';
+  });
+  return s+'</svg>';
+}
+function renderAll(){renderGrid();renderResults();}
+
+/* ---------- Claude (sample) ---------- */
+var sample=null;
+function say(t,err){var m=$("msg");m.textContent=t;m.className=err?"err":"";}
+function errCopy(e){
+  var c=e&&e.code;
+  if(c==="not_granted")return "Claude access was not allowed for this page, so suggestions are off.";
+  if(c==="rate_limited")return "Too many requests or usage limit reached. Try again later.";
+  if(c==="invalid_json")return "Claude's reply could not be read. Try again.";
+  if(c==="cancelled")return "";
+  return "Claude could not answer right now. Try again in a moment.";
+}
+async function suggest(){
+  if(!S.me.name.trim()||!S.kw.trim()){say("Enter your business name and main search term first.",true);return;}
+  var btn=$("suggest");btn.disabled=true;say("Thinking…");
+  var prompt="You help a small business compare itself with competitors.\nBusiness: "+S.me.name+(S.me.url?" ("+S.me.url+")":"")+"\nMain search term: "+S.kw+"\nTown or region: "+(S.city||"not given")+"\n\n"+
+   "Name three real competitors that rank or would be found for that search: 1) role \"leader\": the established market leader, 2) role \"rival\": a direct rival of similar size and price, 3) role \"budget\": a low-cost or generic alternative. Only name businesses you are confident exist in that market; if you are not sure of the website address use an empty string for url. Give price as an integer 1 (budget) to 5 (premium) for how expensive the competitor is for customers.\n"+
+   "Reply with only JSON: {\"competitors\":[{\"role\":\"leader\",\"name\":\"...\",\"url\":\"...\",\"price\":5}, ...]} in the order leader, rival, budget.";
+  try{
+    var d=await sample.json(prompt,{modelTier:"default"});
+    var list=(d&&d.competitors)||[];
+    for(var i=0;i<3&&i<list.length;i++){
+      var c=list[i]||{};
+      S.comps[i].name=String(c.name||"").slice(0,80);
+      S.comps[i].url=String(c.url||"").slice(0,120);
+      var pr=Math.round(Number(c.price));S.comps[i].price=(pr>=1&&pr<=5)?pr:S.comps[i].price;
+    }
+    S.example=false;save();buildSetup();renderAll();
+    say("Competitors filled in from Claude's general knowledge. Check each one is real and edit the names or websites.");
+  }catch(e){say(errCopy(e),true);} 
+  finally{btn.disabled=false;}
+}
+async function prefill(){
+  var names=[0,1,2,3].map(name);
+  if(!S.me.name.trim()){say("Enter your business name first.",true);return;}
+  var btn=$("prefill");btn.disabled=true;say("Thinking…");
+  var urls=[S.me.url].concat(S.comps.map(function(c){return c.url;}));
+  var sites=names.map(function(n,i){return i+": "+n+(urls[i]?" ("+urls[i]+")":"");}).join("\n");
+  var checks=ITEMS.map(function(it){return it.id+": "+it.t;}).join("\n");
+  var prompt="You are helping with a rough website visibility audit. You cannot open websites. For each site below, answer each check only if you genuinely know the answer from general knowledge of that business or its type; otherwise use null. Do not guess for small local businesses you do not know.\n\nSites (index: name):\n"+sites+"\n\nChecks (id: description):\n"+checks+
+   "\n\nReply with only JSON shaped like {\"0\":{\"r_title\":true,\"q_orig\":null,...},\"1\":{...},\"2\":{...},\"3\":{...}} using true, false or null for every check id.";
+  try{
+    var d=await sample.json(prompt,{modelTier:"default"});
+    var n=0;
+    for(var i=0;i<4;i++){
+      var row=d&&d[String(i)];if(!row)continue;
+      ITEMS.forEach(function(it){
+        if(S.cells[i][it.id])return;
+        var v=row[it.id];
+        if(v===true||v===false){S.cells[i][it.id]={v:v?"y":"n",est:true};n++;}
+      });
+    }
+    S.example=false;save();buildSetup();renderAll();
+    say(n?n+" checks pre-filled with dashed outlines. They are unverified guesses: click each to confirm, or click twice more to clear it.":"Claude had no confident answers, so nothing was filled in. Fill the grid by hand.");
+  }catch(e){say(errCopy(e),true);} 
+  finally{btn.disabled=false;}
+}
+
+/* ---------- init ---------- */
+buildSetup();bindSetup();renderAll();
+$("grid").addEventListener("click",onCell);
+$("clear").addEventListener("click",function(){S=blank();save();buildSetup();renderAll();say("");});
+$("suggest").addEventListener("click",suggest);
+$("prefill").addEventListener("click",prefill);
+(async function(){
+  try{sample=window.claude?await window.claude.use("sample"):null;}catch(e){sample=null;}
+  if(sample){$("suggest").hidden=false;$("prefill").hidden=false;}
+})();
+})();
+</script>
+
+</body></html>
