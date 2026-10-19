@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@700&family=Space+Mono:wght@400;700&family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#F9F6F0;--card:#FFFFFF;--text:#1D1D1B;--ink:#1D1D1B;--mustard:#E9B44C;--terra:#D96B43;--forest:#2C4A3E;--pink:#FF4D8D;--cyan:#27C6D9;--violet:#7C4DFF;--bd:#1D1D1B;--sh:4px 4px 0 var(--bd);--shl:8px 8px 0 var(--bd);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--bg:#F9F6F0;--card:#FFFFFF;--text:#1D1D1B;--ink:#1D1D1B;--mustard:#E9B44C;--terra:#D96B43;--forest:#2C4A3E;--pink:#FF4D8D;--cyan:#27C6D9;--violet:#7C4DFF;--bd:#1D1D1B;--sh:4px 4px 0 var(--bd);--shl:6px 6px 0 var(--bd)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#16150F;--card:#201E17;--text:#F4EFE3;--forest:#3F7461;--bd:#F4EFE3}}
 :root[data-theme="dark"]{color-scheme:dark;--bg:#16150F;--card:#201E17;--text:#F4EFE3;--forest:#3F7461;--bd:#F4EFE3}
 html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 80px);scroll-behavior:smooth}
@@ -23,7 +23,7 @@ h1,h2,h3{font-family:'Fraunces',Georgia,serif;line-height:1.1}
 a{color:inherit}
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:100;background:var(--bg);border-bottom:3px solid var(--bd)}
 .nav{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px;flex-wrap:wrap}
-.logo{font:700 24px 'Chakra Petch',sans-serif;letter-spacing:-1px;background:var(--mustard);color:var(--ink);padding:4px 12px;border:3px solid var(--bd);box-shadow:2px 2px 0 var(--bd);text-transform:uppercase;text-decoration:none}
+.logo{font:700 24px 'Chakra Petch',sans-serif;letter-spacing:-1px;background:var(--mustard);color:var(--ink);padding:4px 12px;border:3px solid var(--bd);box-shadow:2px 2px 0 var(--bd);text-transform:uppercase;text-decoration:none;display:inline-block}
 nav{display:flex;gap:22px;font-weight:700;font-size:14px}
 nav a{text-decoration:none;border-bottom:2px solid transparent}
 nav a:hover{border-color:var(--terra)}
@@ -31,12 +31,12 @@ nav a:hover{border-color:var(--terra)}
 .lang{display:flex;border:3px solid var(--bd);box-shadow:2px 2px 0 var(--bd)}
 .lang button{font:700 13px 'Space Mono',monospace;padding:6px 10px;background:var(--card);color:var(--text);border:0;cursor:pointer}
 .lang button[aria-pressed="true"]{background:var(--forest);color:#fff}
-.btn{display:inline-block;font:700 15px 'Space Mono',monospace;padding:14px 24px;border:3px solid var(--bd);box-shadow:var(--sh);text-decoration:none;cursor:pointer;transition:transform .1s,box-shadow .1s;color:#fff}
+.btn{display:inline-block;font:700 15px 'Space Mono',monospace;padding:14px 24px;border:3px solid var(--bd);box-shadow:var(--sh);text-decoration:none;cursor:pointer;transition:transform .1s,box-shadow .1s}
 .btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--bd)}
 .btn.t{background:var(--terra)}.btn.f{background:var(--forest)}.btn.m{background:var(--mustard);color:var(--ink)}
 .btn.sm{padding:9px 16px;font-size:14px}
 .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:40px;align-items:center;padding:80px 24px 90px}
-.tag{display:inline-block;background:var(--mustard);color:var(--ink);border:2px solid var(--bd);padding:4px 12px;font:700 13px 'Space Mono',monospace;text-transform:uppercase;box-shadow:2px 2px 0 var(--bd);margin-bottom:16px}
+.tag{display:inline-block;background:var(--mustard);color:var(--ink);border:2px solid var(--bd);padding:4px 12px;font:700 13px 'Space Mono',monospace;text-transform:uppercase;box-shadow:2px 2px 0 var(--bd)}
 .hero h1{font-size:clamp(38px,5.4vw,66px);margin-bottom:24px}
 .hero h1 span{background:var(--mustard);color:var(--ink);border:2px solid var(--bd);padding:0 8px;display:inline-block;transform:rotate(-1deg)}
 .hero p.lead{font-size:18px;max-width:540px;margin-bottom:32px}
@@ -100,180 +100,194 @@ footer .logo{display:inline-block}
 </style>
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="pz" viewBox="-12 -12 124 124"><path d="M10 10H40a12 12 0 1 1 20 0H90V40a12 12 0 1 0 0 20V90H60a12 12 0 1 1-20 0H10V60a12 12 0 1 0 0-20Z"/></symbol></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="pz" viewBox="-12 -12 124 124"><path d="M10 10H40a12 12 0 1 1 20 0H90V40a12 12 0 1 0 0 20V90H60a12 12 0 1 1-20 0H10V60a12 12 0 1 0 0-20V10Z"/></symbol></svg>
 <header>
- <div class="nav">
-  <a class="logo" href="#top">Altigra</a>
-  <nav>
-   <a href="#services"><span class="nl">Diensten</span><span class="en">Services</span></a>
-   <a href="#process"><span class="nl">Aanpak</span><span class="en">Approach</span></a>
-   <a href="#plans"><span class="nl">Pakketten</span><span class="en">Plans</span></a>
-   <a href="#book">Contact</a>
-  </nav>
-  <div class="right">
-   <div class="lang" role="group" aria-label="Taal / Language">
-    <button type="button" data-set="nl" aria-pressed="true">NL</button>
-    <button type="button" data-set="en" aria-pressed="false">EN</button>
+  <div class="nav">
+   <a class="logo" href="#top">Altigra</a>
+   <nav>
+    <a href="#services"><span class="nl">Diensten</span><span class="en">Services</span></a>
+    <a href="#process"><span class="nl">Aanpak</span><span class="en">Approach</span></a>
+    <a href="#plans"><span class="nl">Pakketten</span><span class="en">Plans</span></a>
+    <a href="/visibility-check.html"><span class="nl">Audit</span><span class="en">Audit</span></a>
+    <a href="#book">Contact</a>
+   </nav>
+   <div class="right">
+    <div class="lang" role="group" aria-label="Taal / Language">
+     <button type="button" data-set="nl" aria-pressed="true">NL</button>
+     <button type="button" data-set="en" aria-pressed="false">EN</button>
+    </div>
+    <a class="btn t sm" href="#book"><span class="nl">Boek een consultancy</span><span class="en">Book a consultation</span></a>
    </div>
-   <a class="btn t sm" href="#book"><span class="nl">Boek een consultancy</span><span class="en">Book a consultation</span></a>
   </div>
- </div>
 </header>
 
 <main id="top">
 <div class="wrap hero">
- <svg class="pz" style="--c:var(--pink);--r:14deg;top:24px;right:-8px;width:96px" aria-hidden="true"><use href="#pz"/></svg>
- <svg class="pz" style="--c:var(--cyan);--r:-18deg;bottom:12px;left:48%;width:64px" aria-hidden="true"><use href="#pz"/></svg>
- <svg class="pz" style="--c:var(--violet);--r:24deg;bottom:-18px;right:6%;width:78px" aria-hidden="true"><use href="#pz"/></svg>
- <div>
-  <span class="tag"><span class="nl">Digitale groeipartner voor lokale ondernemers</span><span class="en">Digital growth partner for local businesses</span></span>
-  <h1>
-   <span class="nl">We leggen de <span>puzzel</span> voor jouw lokale zichtbaarheid.</span>
-   <span class="en">Putting the <span>pieces together</span> for your local visibility.</span>
-  </h1>
-  <p class="lead">
-   <span class="nl">Lokale zichtbaarheid, online vertrouwen en groei: we brengen SEO en Google Ads samen in één aanpak, zodat elke euro budget werkt.</span>
-   <span class="en">Local visibility, online trust and growth: we bring SEO and Google Ads together in one approach, so every euro of budget works.</span>
-  </p>
-  <div class="btns">
-   <a class="btn f" href="#book"><span class="nl">Boek een consultancy</span><span class="en">Book a consultation</span></a>
-   <a class="btn m" href="tel:+32472401505"><span class="nl">Bel +32 472 40 15 05</span><span class="en">Call +32 472 40 15 05</span></a>
+  <svg class="pz" style="--c:var(--pink);--r:14deg;top:24px;right:-8px;width:96px" aria-hidden="true"><use href="#pz"/></svg>
+  <svg class="pz" style="--c:var(--cyan);--r:-18deg;bottom:12px;left:48%;width:64px" aria-hidden="true"><use href="#pz"/></svg>
+  <svg class="pz" style="--c:var(--violet);--r:24deg;bottom:-18px;right:6%;width:78px" aria-hidden="true"><use href="#pz"/></svg>
+  <div>
+   <span class="tag"><span class="nl">Digitale groeipartner voor lokale ondernemers</span><span class="en">Digital growth partner for local businesses</span></span>
+   <h1>
+    <span class="nl">We leggen de <span>puzzel</span> voor jouw lokale zichtbaarheid.</span>
+    <span class="en">Putting the <span>pieces together</span> for your local visibility.</span>
+   </h1>
+   <p class="lead">
+    <span class="nl">Lokale zichtbaarheid, online vertrouwen en groei: we brengen SEO en Google Ads samen in één aanpak, zodat elke euro budget werkt.</span>
+    <span class="en">Local visibility, online trust and growth: we bring SEO and Google Ads together in one approach, so every euro of budget works.</span>
+   </p>
+   <div class="btns">
+    <a class="btn f" href="#book"><span class="nl">Boek een consultancy</span><span class="en">Book a consultation</span></a>
+    <a class="btn m" href="tel:+32472401505"><span class="nl">Bel +32 472 40 15 05</span><span class="en">Call +32 472 40 15 05</span></a>
+   </div>
   </div>
- </div>
- <div class="pbox"><div class="pgrid">
-  <div class="pc m"><h3>SEO</h3><p><span class="nl">Maps &amp; organisch</span><span class="en">Maps &amp; organic</span></p></div>
-  <div class="pc t"><h3>ADS</h3><p><span class="nl">Gericht zoekverkeer</span><span class="en">High-intent search</span></p></div>
-  <div class="pc f"><h3><span class="nl">VERTROUWEN</span><span class="en">TRUST</span></h3><p><span class="nl">Reviews &amp; profiel</span><span class="en">Reviews &amp; profile</span></p></div>
-  <div class="pc c"><h3><span class="nl">GROEI</span><span class="en">GROWTH</span></h3><p><span class="nl">Meer klanten</span><span class="en">More customers</span></p></div>
- </div></div>
+  <div class="pbox"><div class="pgrid">
+   <div class="pc m"><h3>SEO</h3><p><span class="nl">Maps &amp; organisch</span><span class="en">Maps &amp; organic</span></p></div>
+   <div class="pc t"><h3>ADS</h3><p><span class="nl">Gericht zoekverkeer</span><span class="en">High-intent search</span></p></div>
+   <div class="pc f"><h3><span class="nl">VERTROUWEN</span><span class="en">TRUST</span></h3><p><span class="nl">Reviews &amp; profiel</span><span class="en">Reviews &amp; profile</span></p></div>
+   <div class="pc c"><h3><span class="nl">GROEI</span><span class="en">GROWTH</span></h3><p><span class="nl">Meer klanten</span><span class="en">More customers</span></p></div>
+  </div></div>
 </div>
 
 <div class="marq" aria-hidden="true"><div><span class="nl" data-m="Lokale zichtbaarheid ✦ Online vertrouwen ✦ Groei ✦ "></span><span class="en" data-m="Local visibility ✦ Online trust ✦ Growth ✦ "></span></div></div>
 
 <section id="services">
- <svg class="pz" style="--c:var(--cyan);--r:-12deg;left:-22px;top:26px;width:92px" aria-hidden="true"><use href="#pz"/></svg>
- <svg class="pz" style="--c:var(--mustard);--r:20deg;right:-16px;top:70px;width:72px" aria-hidden="true"><use href="#pz"/></svg>
+  <svg class="pz" style="--c:var(--cyan);--r:-12deg;left:-22px;top:26px;width:92px" aria-hidden="true"><use href="#pz"/></svg>
+  <svg class="pz" style="--c:var(--mustard);--r:20deg;right:-16px;top:70px;width:72px" aria-hidden="true"><use href="#pz"/></svg>
 <div class="wrap">
- <div class="sh"><span class="tag"><span class="nl">De 3 blokken</span><span class="en">The 3 blocks</span></span>
-  <h2><span class="nl">Een groeisysteem dat in elkaar klikt</span><span class="en">A growth system that locks together</span></h2>
-  <p><span class="nl">Elk onderdeel sluit aan op het volgende: minder verspilling, meer aanvragen.</span><span class="en">Every piece fits the next one: less waste, more enquiries.</span></p></div>
- <div class="grid3">
-  <div class="card"><div><div class="num">01</div>
-   <h3><span class="nl">Lokale SEO</span><span class="en">Local SEO</span></h3>
-   <p><span class="nl">Word gevonden op Google Maps en in de lokale zoekresultaten, precies waar je klanten zoeken.</span><span class="en">Get found on Google Maps and in local search results, right where your customers look.</span></p></div>
-   <ul><li><span class="nl">Google Bedrijfsprofiel optimaliseren</span><span class="en">Google Business Profile optimisation</span></li>
-   <li><span class="nl">Lokale vermeldingen en autoriteit</span><span class="en">Local citations and authority</span></li>
-   <li><span class="nl">Reviews en online vertrouwen</span><span class="en">Reviews and online trust</span></li></ul></div>
-  <div class="card"><div><div class="num">02</div>
-   <h3>Google Ads</h3>
-   <p><span class="nl">Geen budget verspillen aan brede zoektermen. Gerichte campagnes voor klanten die nu willen bellen of kopen.</span><span class="en">Stop wasting budget on broad keywords. Targeted campaigns for customers ready to call or buy now.</span></p></div>
-   <ul><li><span class="nl">Gericht zoekwoordenplan</span><span class="en">Precision keyword targeting</span></li>
-   <li><span class="nl">Uitsluitende zoekwoorden</span><span class="en">Negative keyword shielding</span></li>
-   <li><span class="nl">Doorlopende optimalisatie</span><span class="en">Continuous optimisation</span></li></ul></div>
-  <div class="card"><div><div class="num">03</div>
-   <h3><span class="nl">Conversie &amp; tracking</span><span class="en">Conversion &amp; tracking</span></h3>
-   <p><span class="nl">Verkeer is niets waard zonder actie. Elke klik moet leiden tot een telefoontje, aanvraag of bezoek.</span><span class="en">Traffic means nothing without action. Every click should lead to a call, enquiry or visit.</span></p></div>
-   <ul><li><span class="nl">Heldere landingspagina’s</span><span class="en">Frictionless landing pages</span></li>
-   <li><span class="nl">Oproep- en formuliertracking</span><span class="en">Call and form tracking</span></li>
-   <li><span class="nl">Overzichtelijke rapportering</span><span class="en">Clear reporting</span></li></ul></div>
- </div>
+  <div class="sh"><span class="tag"><span class="nl">Growth infrastructure</span><span class="en">Growth infrastructure</span></span>
+   <h2><span class="nl">Zet de juiste motoren aan voor meer lokale winsten</span><span class="en">Turn the right levers to increase local revenue</span></h2>
+   <p><span class="nl">ALTIGRA bouwt een aantrekkelijker, meetbaarder en winstgevender kanaal: van vindbaarheid tot omzet.</span><span class="en">ALTIGRA builds a more visible, measurable and profitable funnel: from discoverability to revenue.</span></p>
+  </div>
+  <div class="grid3">
+   <div class="card"><div><div class="num">01</div>
+    <h3><span class="nl">Hyper-Local SEO &amp; Authority Engine</span><span class="en">Hyper-Local SEO &amp; Authority Engine</span></h3>
+    <p><span class="nl">Domineer lokale zoekresultaten, Google Maps en spraakgestuurde vindbaarheid met een krachtig lokaal autoriteitsplatform.</span><span class="en">Own local rankings, Google Maps visibility and voice search discoverability with a high-authority local growth engine.</span></p>
+    <ul>
+      <li><span class="nl">Google Business Profile deep optimization en GEO-schema injectie</span><span class="en">Google Business Profile deep optimization and GEO-schema implementation</span></li>
+      <li><span class="nl">Local citation alignment en NAP-netwerk cleanup</span><span class="en">Local citation alignment and NAP network cleanup</span></li>
+      <li><span class="nl">Hyper-lokale content clusters en semantische context mapping</span><span class="en">Hyper-local content clusters and semantic context mapping</span></li>
+      <li><span class="nl">Automated review velocity en reputatiemanagement</span><span class="en">Automated review velocity and reputation management</span></li>
+    </ul></div>
+   </div>
+   <div class="card"><div><div class="num">02</div>
+    <h3><span class="nl">High-Intent Google Ads &amp; Revenue Funnels</span><span class="en">High-Intent Google Ads &amp; Revenue Funnels</span></h3>
+    <p><span class="nl">Verminder budgetverlies en zet zoekvolume om in echte telefoontjes, formuliers en klantencontacten.</span><span class="en">Cut wasted spend and turn search volume into phone calls, form fills and revenue-generating conversations.</span></p>
+    <ul>
+      <li><span class="nl">Negative keyword perimeter defense en match-type architecture</span><span class="en">Negative keyword perimeter defense and match-type architecture</span></li>
+      <li><span class="nl">High-converting custom landing pages per campagne</span><span class="en">High-converting custom landing pages tailored per campaign</span></li>
+      <li><span class="nl">CRO en A/B testing framework voor betere conversies</span><span class="en">CRO and A/B testing framework for stronger conversion performance</span></li>
+      <li><span class="nl">Server-side tracking via GTM voor data-precisie</span><span class="en">Server-side tracking through GTM for full-funnel data accuracy</span></li>
+    </ul></div>
+   </div>
+   <div class="card"><div><div class="num">03</div>
+    <h3><span class="nl">Infrastructure, Tracking &amp; Growth Automation</span><span class="en">Infrastructure, Tracking &amp; Growth Automation</span></h3>
+    <p><span class="nl">Koppel online verkeer aan echte bedrijfsresultaten via een transparante data-infrastructuur en slimme automations.</span><span class="en">Connect traffic to operational performance with transparent attribution and automation that turns data into action.</span></p>
+    <ul>
+      <li><span class="nl">Call tracking, lead attribution en WhatsApp business routing</span><span class="en">Call tracking, lead attribution and WhatsApp business routing</span></li>
+      <li><span class="nl">AppSheet / Google Sheets dashboards en automatisch rapporteren</span><span class="en">AppSheet / Google Sheets dashboards and automated reporting</span></li>
+      <li><span class="nl">CRM lead sync en instant SMS/Email-notificaties</span><span class="en">CRM lead sync and instant SMS/email notification flows</span></li>
+      <li><span class="nl">Realtime ROI en Visibility Gap analytics</span><span class="en">Real-time ROI and visibility gap analytics</span></li>
+    </ul></div>
+   </div>
+  </div>
 </div></section>
 
 <section id="process">
- <svg class="pz" style="--c:var(--violet);--r:16deg;left:-18px;bottom:30px;width:84px" aria-hidden="true"><use href="#pz"/></svg>
- <svg class="pz" style="--c:var(--pink);--r:-22deg;right:-10px;top:30px;width:70px" aria-hidden="true"><use href="#pz"/></svg>
+  <svg class="pz" style="--c:var(--violet);--r:16deg;left:-18px;bottom:30px;width:84px" aria-hidden="true"><use href="#pz"/></svg>
+  <svg class="pz" style="--c:var(--pink);--r:-22deg;right:-10px;top:30px;width:70px" aria-hidden="true"><use href="#pz"/></svg>
 <div class="wrap">
- <div class="sh"><span class="tag"><span class="nl">Zo klikt het in elkaar</span><span class="en">How it snaps together</span></span>
-  <h2><span class="nl">Een eenvoudige aanpak in 3 stappen</span><span class="en">A simple 3-step approach</span></h2></div>
- <div class="grid3">
-  <div class="step"><h3><b>1.</b> <span class="nl">Analyse</span><span class="en">Diagnose</span></h3><p><span class="nl">We bekijken je online aanwezigheid, zien waar klanten afhaken en vinden de snelste groeikansen.</span><span class="en">We review your online presence, spot where customers drop off and find the fastest growth opportunities.</span></p></div>
-  <div class="step"><h3><b>2.</b> <span class="nl">Opbouw</span><span class="en">Build</span></h3><p><span class="nl">We bouwen je lokale SEO en je Google Ads-campagnes op en koppelen ze aan één duidelijk contactpad.</span><span class="en">We build your local SEO and Google Ads campaigns and connect them to one clear path to contact.</span></p></div>
-  <div class="step"><h3><b>3.</b> <span class="nl">Opvolging</span><span class="en">Measure &amp; scale</span></h3><p><span class="nl">We volgen de resultaten op en sturen bij, zodat je weet wat het oplevert.</span><span class="en">We track results and keep refining, so you know what it delivers.</span></p></div>
- </div>
+  <div class="sh"><span class="tag"><span class="nl">Zo klikt het in elkaar</span><span class="en">How it snaps together</span></span>
+   <h2><span class="nl">Een eenvoudige aanpak in 3 stappen</span><span class="en">A simple 3-step approach</span></h2></div>
+  <div class="grid3">
+   <div class="step"><h3><b>1.</b> <span class="nl">Analyse</span><span class="en">Diagnose</span></h3><p><span class="nl">We bekijken je online aanwezigheid, zien waar klanten afhaken en vinden de grootste opbrengsten in je huidige funnel.</span><span class="en">We review your digital presence, find where customers drop off, and uncover the biggest upside in your current funnel.</span></p></div>
+   <div class="step"><h3><b>2.</b> <span class="nl">Opbouw</span><span class="en">Build</span></h3><p><span class="nl">We bouwen je lokale SEO, tracking, ads en conversiesystemen op zodat elk onderdeel werkt naar dezelfde KPI.</span><span class="en">We build your local SEO, tracking, ads and conversion systems so every piece drives toward the same KPI and revenue target.</span></p></div>
+   <div class="step"><h3><b>3.</b> <span class="nl">Opvolging</span><span class="en">Measure &amp; scale</span></h3><p><span class="nl">We volgen de resultaten op en bijsturen op basis van data, zodat je groei niet ad hoc, maar structureel wordt.</span><span class="en">We monitor real performance and optimize decisions based on data so growth becomes repeatable, not accidental.</span></p></div>
+  </div>
 </div></section>
 
 <section id="plans">
- <svg class="pz" style="--c:var(--cyan);--r:12deg;right:-14px;top:20px;width:76px" aria-hidden="true"><use href="#pz"/></svg>
- <svg class="pz" style="--c:var(--violet);--r:-16deg;left:-12px;bottom:60px;width:60px" aria-hidden="true"><use href="#pz"/></svg>
+  <svg class="pz" style="--c:var(--cyan);--r:12deg;right:-14px;top:20px;width:76px" aria-hidden="true"><use href="#pz"/></svg>
+  <svg class="pz" style="--c:var(--violet);--r:-16deg;left:-12px;bottom:60px;width:60px" aria-hidden="true"><use href="#pz"/></svg>
 <div class="wrap">
- <div class="sh"><span class="tag"><span class="nl">Pakketten</span><span class="en">Plans</span></span>
-  <h2><span class="nl">Helder, transparant, maandelijks</span><span class="en">Clear, transparent, monthly</span></h2>
-  <p><span class="nl">Kies wat bij je zaak past. Alle prijzen zijn exclusief btw.</span><span class="en">Pick what fits your business. All prices exclude VAT.</span></p></div>
- <div class="grid3">
-  <div class="card"><div><h3>Visible</h3><div class="price">€149<small><span class="nl"> /maand</span><span class="en"> /month</span></small></div>
-   <p><span class="nl">Voor restaurants, bakkerijen en winkels.</span><span class="en">For restaurants, bakeries and shops.</span></p></div>
-   <ul><li><span class="nl">Beheer van je Google Bedrijfsprofiel (posts, foto’s, openingsuren, Q&amp;A)</span><span class="en">Google Business Profile management (posts, photos, hours, Q&amp;A)</span></li>
-   <li><span class="nl">Reviewaanvragen via QR of link, met antwoordvoorstellen</span><span class="en">Review requests via QR or link, with reply drafts</span></li>
-   <li><span class="nl">Maandrapport: oproepen, routeaanvragen, klikken</span><span class="en">Monthly report: calls, directions, clicks</span></li></ul></div>
-  <div class="card"><div><h3>Leads</h3><div class="price">€349<small><span class="nl"> /maand</span><span class="en"> /month</span></small></div>
-   <p><span class="nl">Voor technische bedrijven en dienstverleners met hoge waarde per klant.</span><span class="en">For trades and service businesses with high value per customer.</span></p></div>
-   <ul><li><span class="nl">Alles van Visible</span><span class="en">Everything in Visible</span></li>
-   <li><span class="nl">Oproep- en formuliertracking</span><span class="en">Call and form tracking</span></li>
-   <li><span class="nl">1 nieuwe of bijgewerkte dienstpagina per maand</span><span class="en">1 new or updated service page per month</span></li>
-   <li><span class="nl">Maandelijks gesprek van 30 minuten</span><span class="en">30-minute monthly call</span></li></ul></div>
-  <div class="card"><div><h3>Leads + Ads</h3><div class="price">€549<small><span class="nl"> /maand</span><span class="en"> /month</span></small></div>
-   <p><span class="nl">Voor wie sneller extra aanvragen wil via Google-advertenties.</span><span class="en">For businesses that want extra enquiries faster through Google ads.</span></p></div>
-   <ul><li><span class="nl">Alles van Leads</span><span class="en">Everything in Leads</span></li>
-   <li><span class="nl">Google Ads-beheer met uitsluitende zoekwoorden</span><span class="en">Google Ads management with negative keywords</span></li>
-   <li><span class="nl">Conversietracking en advertentierapport</span><span class="en">Conversion tracking and ad reporting</span></li>
-   <li><span class="nl">Advertentiebudget min. €300/maand, rechtstreeks aan Google betaald</span><span class="en">Ad budget min. €300/month, paid directly to Google</span></li></ul></div>
- </div>
- <p class="fine"><span class="nl">Minimaal 3 maanden, daarna maandelijks opzegbaar. Extra vestiging: +€75/maand.</span><span class="en">Minimum 3 months, then cancel monthly. Extra location: +€75/month.</span></p>
+  <div class="sh"><span class="tag"><span class="nl">Pakketten</span><span class="en">Plans</span></span>
+   <h2><span class="nl">Helder, transparant, maandelijks</span><span class="en">Clear, transparent, monthly</span></h2>
+   <p><span class="nl">Kies wat bij je zaak past. Alle prijzen zijn exclusief btw.</span><span class="en">Pick what fits your business. All prices exclude VAT.</span></p></div>
+  <div class="grid3">
+   <div class="card"><div><h3>Visible</h3><div class="price">€149<small><span class="nl"> /maand</span><span class="en"> /month</span></small></div>
+    <p><span class="nl">Voor restaurants, bakkerijen en winkels.</span><span class="en">For restaurants, bakeries and shops.</span></p></div>
+    <ul><li><span class="nl">Beheer van je Google Bedrijfsprofiel (posts, foto’s, openingsuren, Q&amp;A)</span><span class="en">Google Business Profile management (posts, photos, hours, Q&amp;A)</span></li>
+    <li><span class="nl">Reviewaanvragen via QR of link, met antwoordvoorstellen</span><span class="en">Review requests via QR or link, with reply drafts</span></li>
+    <li><span class="nl">Maandrapport: oproepen, routeaanvragen, klikken</span><span class="en">Monthly report: calls, directions, clicks</span></li></ul></div>
+   <div class="card"><div><h3>Leads</h3><div class="price">€349<small><span class="nl"> /maand</span><span class="en"> /month</span></small></div>
+    <p><span class="nl">Voor technische bedrijven en dienstverleners met hoge waarde per klant.</span><span class="en">For trades and service businesses with high value per customer.</span></p></div>
+    <ul><li><span class="nl">Alles van Visible</span><span class="en">Everything in Visible</span></li>
+    <li><span class="nl">Oproep- en formuliertracking</span><span class="en">Call and form tracking</span></li>
+    <li><span class="nl">1 nieuwe of bijgewerkte dienstpagina per maand</span><span class="en">1 new or updated service page per month</span></li>
+    <li><span class="nl">Maandelijks gesprek van 30 minuten</span><span class="en">30-minute monthly call</span></li></ul></div>
+   <div class="card"><div><h3>Leads + Ads</h3><div class="price">€549<small><span class="nl"> /maand</span><span class="en"> /month</span></small></div>
+    <p><span class="nl">Voor wie sneller extra aanvragen wil via Google-advertenties.</span><span class="en">For businesses that want extra enquiries faster through Google ads.</span></p></div>
+    <ul><li><span class="nl">Alles van Leads</span><span class="en">Everything in Leads</span></li>
+    <li><span class="nl">Google Ads-beheer met uitsluitende zoekwoorden</span><span class="en">Google Ads management with negative keywords</span></li>
+    <li><span class="nl">Conversietracking en advertentierapport</span><span class="en">Conversion tracking and ad reporting</span></li>
+    <li><span class="nl">Advertentiebudget min. €300/maand, rechtstreeks aan Google betaald</span><span class="en">Ad budget min. €300/month, paid directly to Google</span></li></ul></div>
+  </div>
+  <p class="fine"><span class="nl">Minimaal 3 maanden, daarna maandelijks opzegbaar. Extra vestiging: +€75/maand.</span><span class="en">Minimum 3 months, then cancel monthly. Extra location: +€75/month.</span></p>
 </div></section>
 
 <section id="start">
- <svg class="pz" style="--c:var(--terra);--r:18deg;left:-16px;top:40px;width:80px" aria-hidden="true"><use href="#pz"/></svg>
- <svg class="pz" style="--c:var(--cyan);--r:-10deg;right:-14px;bottom:30px;width:70px" aria-hidden="true"><use href="#pz"/></svg>
+  <svg class="pz" style="--c:var(--terra);--r:18deg;left:-16px;top:40px;width:80px" aria-hidden="true"><use href="#pz"/></svg>
+  <svg class="pz" style="--c:var(--cyan);--r:-10deg;right:-14px;bottom:30px;width:70px" aria-hidden="true"><use href="#pz"/></svg>
 <div class="wrap bk">
- <div class="panel">
-  <h2><span class="nl">Opstartpakketten</span><span class="en">One-off setup packages</span></h2>
-  <p><span class="nl">Eenmalig, exclusief btw. Je start klein en groeit mee.</span><span class="en">One-off, excl. VAT. Start small and grow from there.</span></p>
-  <ul class="ci">
-   <li><small><span class="nl">Mini-audit · €150</span><span class="en">Mini audit · €150</span></small><span class="nl">Momentopname van het klantpad en drie concrete verbeteringen. Wordt verrekend als je start.</span><span class="en">Snapshot of the customer journey and three concrete fixes. Credited if you sign up.</span></li>
-   <li><small>Profile Fix · <span class="nl">€290</span><span class="en">€290</span></small><span class="nl">Google Bedrijfsprofiel volledig ingericht (categorieën, diensten, uren, foto’s), reviewlink en QR-code.</span><span class="en">Google Business Profile completed (categories, services, hours, photos), review link and QR code.</span></li>
-   <li><small>Visibility Pack · <span class="nl">€690</span><span class="en">€690</span></small><span class="nl">Profile Fix + websitebasis (titels, contactgegevens, mobiele fixes), oproep- en formuliertracking en 1 dienstpagina.</span><span class="en">Profile Fix + website basics (titles, contact details, mobile fixes), call and form tracking and 1 service page.</span></li>
-   <li><small>Lead Machine Launch · <span class="nl">€1.290</span><span class="en">€1,290</span></small><span class="nl">Visibility Pack + 3 tot 5 dienstpagina’s, landingspagina en Google Ads-account met eerste campagne en conversietracking.</span><span class="en">Visibility Pack + 3 to 5 service pages, landing page and Google Ads account with first campaign and conversion tracking.</span></li>
-  </ul>
- </div>
- <div class="panel">
-  <h2><span class="nl">Eerlijk en meetbaar</span><span class="en">Honest and measurable</span></h2>
-  <ul class="ci">
-   <li><small><span class="nl">Geen valse beloftes</span><span class="en">No false promises</span></small><span class="nl">We beloven geen posities, bezoekersaantallen of omzet. We rapporteren op oproepen, boekingen en offerteaanvragen.</span><span class="en">We promise no rankings, visitor numbers or revenue. We report on calls, bookings and quote requests.</span></li>
-   <li><small><span class="nl">Nulmeting eerst</span><span class="en">Baseline first</span></small><span class="nl">We leggen eerst de huidige situatie vast en vergelijken daarna dezelfde periodes.</span><span class="en">We record the current situation first, then compare equivalent periods.</span></li>
-   <li><small><span class="nl">Jij houdt controle</span><span class="en">You stay in control</span></small><span class="nl">We werken pas in je accounts na jouw toestemming en wijzigen je advertentiebudget nooit zonder schriftelijke goedkeuring.</span><span class="en">We only work in your accounts with your permission and never change your ad budget without written approval.</span></li>
-   <li><small><span class="nl">Duidelijke bronnen</span><span class="en">Clear sources</span></small><span class="nl">Elke bevinding heeft een bron, datum en zoekopdracht. Schattingen van externe tools noemen we ook zo.</span><span class="en">Every finding has a source, date and query. Estimates from third-party tools are labelled as estimates.</span></li>
-   <li><small><span class="nl">Wat we nakijken</span><span class="en">What we check</span></small><span class="nl">Technische basis, lokaal profiel, inhoud en vertrouwen, contactpad op mobiel, meting en, indien relevant, Google Ads.</span><span class="en">Technical basics, local profile, content and trust, mobile contact path, tracking and, where relevant, Google Ads.</span></li>
-  </ul>
- </div>
+  <div class="panel">
+   <h2><span class="nl">Opstartpakketten</span><span class="en">One-off setup packages</span></h2>
+   <p><span class="nl">Eenmalig, exclusief btw. Je start klein en groeit mee.</span><span class="en">One-off, excl. VAT. Start small and grow from there.</span></p>
+   <ul class="ci">
+    <li><small><span class="nl">Mini-audit · €150</span><span class="en">Mini audit · €150</span></small><span class="nl">Momentopname van het klantpad en drie concrete verbeteringen. Wordt snel duidelijk welke kansen je mist.</span><span class="en">A quick snapshot of the customer journey and three concrete improvements. Surfaces the biggest gaps quickly.</span></li>
+    <li><small>Profile Fix · <span class="nl">€290</span><span class="en">€290</span></small><span class="nl">Google Bedrijfsprofiel volledig ingericht (categorieën, diensten, uren, foto’s, reviewflow).</span><span class="en">Full Google Business Profile setup (categories, services, hours, photos, review flow).</span></li>
+    <li><small>Visibility Pack · <span class="nl">€690</span><span class="en">€690</span></small><span class="nl">Profile Fix + websitebasis (titels, contactgegevens, mobiele fixes), oproep- en formuliertracking.</span><span class="en">Profile Fix + website essentials (titles, contact details, mobile fixes), call and form tracking.</span></li>
+    <li><small>Lead Machine Launch · <span class="nl">€1.290</span><span class="en">€1,290</span></small><span class="nl">Visibility Pack + 3 à 5 dienstpagina’s, landingspagina en Google Ads-opstart.</span><span class="en">Visibility Pack + 3 to 5 service pages, landing page and Google Ads launch.</span></li>
+   </ul>
+  </div>
+  <div class="panel">
+   <h2><span class="nl">Eerlijk en meetbaar</span><span class="en">Honest and measurable</span></h2>
+   <ul class="ci">
+    <li><small><span class="nl">Geen valse beloftes</span><span class="en">No false promises</span></small><span class="nl">We beloven geen posities, bezoekersaantallen of omzet. We rapporteren op meetbare acties en impact.</span><span class="en">We do not promise rankings, traffic or revenue. We report on measurable actions and impact.</span></li>
+    <li><small><span class="nl">Nulmeting eerst</span><span class="en">Baseline first</span></small><span class="nl">We leggen eerst de huidige situatie vast en vergelijken daarna dezelfde periode.</span><span class="en">We establish the current baseline first and compare the same periods before and after.</span></li>
+    <li><small><span class="nl">Jij houdt controle</span><span class="en">You stay in control</span></small><span class="nl">We werken pas in je accounts na jouw toestemming en wijzigen je advertenties alleen met jouw goedkeuring.</span><span class="en">We only work in your accounts after permission, and make changes only with your approval.</span></li>
+    <li><small><span class="nl">Duidelijke bronnen</span><span class="en">Clear sources</span></small><span class="nl">Elke bevinding heeft een bron, datum en zoekopdracht. Schattingen van externe data worden expliciet benoemd.</span><span class="en">Each finding has a source, date and search query. External data estimates are clearly identified.</span></li>
+    <li><small><span class="nl">Wat we nakijken</span><span class="en">What we check</span></small><span class="nl">Technische basis, lokaal profiel, inhoud en vertrouwen, contactpad op mobiel, metrieken en het echte klantpad.</span><span class="en">Technical basics, local profile, content and trust, mobile contact path, metrics, and the actual customer journey.</span></li>
+   </ul>
+  </div>
 </div></section>
 
 <section id="book">
- <svg class="pz" style="--c:var(--pink);--r:-14deg;left:-18px;bottom:24px;width:88px" aria-hidden="true"><use href="#pz"/></svg>
- <svg class="pz" style="--c:var(--violet);--r:20deg;right:-12px;top:18px;width:74px" aria-hidden="true"><use href="#pz"/></svg>
+  <svg class="pz" style="--c:var(--pink);--r:-14deg;left:-18px;bottom:24px;width:88px" aria-hidden="true"><use href="#pz"/></svg>
+  <svg class="pz" style="--c:var(--violet);--r:20deg;right:-12px;top:18px;width:74px" aria-hidden="true"><use href="#pz"/></svg>
 <div class="wrap bk">
- <div class="panel">
-  <span class="tag"><span class="nl">Consultancy</span><span class="en">Consultation</span></span>
-  <h2><span class="nl">Boek een consultancy</span><span class="en">Book a consultation</span></h2>
-  <p><span class="nl">Kies hieronder een moment dat past. Je ontvangt meteen een bevestiging per e-mail. We bekijken je zichtbaarheid en tonen hoe SEO en Google Ads voor jou samenwerken. Gratis en vrijblijvend.</span><span class="en">Pick a time below that suits you. You get an email confirmation straight away. We review your visibility and show how SEO and Google Ads can work together for you. Free and no obligation.</span></p>
-  <div class="calendly-inline-widget cal" data-url="https://calendly.com/altigra"></div>
-  <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
-  <p class="note"><span class="nl">Laadt de agenda niet? </span><span class="en">Calendar not loading? </span><a href="https://calendly.com/altigra" target="_blank" rel="noopener"><span class="nl">Open ze in een nieuw tabblad</span><span class="en">Open it in a new tab</span></a><span class="nl"> of bel +32 472 40 15 05.</span><span class="en"> or call +32 472 40 15 05.</span></p>
- </div>
- <div class="panel">
-  <h2>Contact</h2>
-  <ul class="ci">
-   <li><small>GSM</small><a href="tel:+32472401505">+32 472 40 15 05</a></li>
-   <li><small>E-mail</small><a href="mailto:info@altigra.be">info@altigra.be</a></li>
-  </ul>
-  <p class="ps"><span class="nl">Wij geven om lokale ondernemingen, omdat we er zelf één zijn.</span><span class="en">We care about local businesses, because we are one ourselves.</span></p>
- </div>
+  <div class="panel">
+   <span class="tag"><span class="nl">Consultancy</span><span class="en">Consultation</span></span>
+   <h2><span class="nl">Boek een consultancy</span><span class="en">Book a consultation</span></h2>
+   <p><span class="nl">Kies hieronder een moment dat past. Je ontvangt meteen een bevestiging per e-mail. We bekijken je zichtbaarheid en tonen hoe SEO en Google Ads voor jou samenwerken. Gratis eerste bespreking.</span><span class="en">Choose a suitable slot below. You will receive an instant confirmation by email. We review your visibility and show how SEO and Google Ads can work together for your business.</span></p>
+   <div class="calendly-inline-widget cal" data-url="https://calendly.com/altigra"></div>
+   <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+   <p class="note"><span class="nl">Laadt de agenda niet? </span><span class="en">Calendar not loading? </span><a href="https://calendly.com/altigra" target="_blank" rel="noopener"><span class="nl">Gebruik deze link</span><span class="en">Use this link</span></a></p>
+  </div>
+  <div class="panel">
+   <h2>Contact</h2>
+   <ul class="ci">
+    <li><small>GSM</small><a href="tel:+32472401505">+32 472 40 15 05</a></li>
+    <li><small>E-mail</small><a href="mailto:info@altigra.be">info@altigra.be</a></li>
+   </ul>
+   <p class="ps"><span class="nl">Wij geven om lokale ondernemingen, omdat we er zelf één zijn.</span><span class="en">We care about local businesses, because we are one ourselves.</span></p>
+  </div>
 </div></section>
 </main>
 
 <footer><div class="wrap">
- <a class="logo" href="#top">Altigra</a>
- <p class="tg"><span class="nl">Lokale zichtbaarheid · Online vertrouwen · Groei</span><span class="en">Local visibility · Online trust · Growth</span></p>
- <p>© 2026 Altigra · <a href="mailto:info@altigra.be">info@altigra.be</a> · <a href="tel:+32472401505">+32 472 40 15 05</a></p>
+  <a class="logo" href="#top">Altigra</a>
+  <p class="tg"><span class="nl">Lokale zichtbaarheid · Online vertrouwen · Groei</span><span class="en">Local visibility · Online trust · Growth</span></p>
+  <p>© 2026 Altigra · <a href="mailto:info@altigra.be">info@altigra.be</a> · <a href="tel:+32472401505">+32 472 40 15 05</a></p>
 </div></footer>
 
 <script>
@@ -285,7 +299,8 @@ try{var s=localStorage.getItem("altigra-lang");if(s==="nl"||s==="en")lang=s}catc
 function set(l){lang=l;root.setAttribute("data-lang",l);root.lang=l;
  document.querySelectorAll(".lang button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.set===l?"true":"false")});
  document.title=l==="nl"?"Altigra — Lokale zichtbaarheid · Online vertrouwen · Groei":"Altigra — Local visibility · Online trust · Growth";
- try{localStorage.setItem("altigra-lang",l)}catch(e){}}
+ try{localStorage.setItem("altigra-lang",l)}catch(e){}
+}
 document.querySelectorAll(".lang button").forEach(function(b){b.addEventListener("click",function(){set(b.dataset.set)})});
 document.querySelectorAll("[data-m]").forEach(function(e){e.textContent=e.dataset.m.repeat(12)});
 set(lang);
