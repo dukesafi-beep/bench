@@ -7,6 +7,13 @@ function save(){}
 function message(text,error=false){$('error').hidden=!error;$('error').textContent=error?text:'';$('status').textContent=error?'':text;}
 function safeURL(s){try{const u=new URL(s);return ['https:','http:'].includes(u.protocol)?u.href:'#';}catch{return '#';}}
 async function api(data){const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),30000);try{const r=await fetch('/.netlify/functions/audit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data),signal:controller.signal});let result;try{result=await r.json();}catch{throw Error('The audit service is unavailable. Please try again shortly.');}if(!r.ok)throw Error(result.error||'The check could not finish.');return result;}catch(e){if(e.name==='AbortError')throw Error('The check timed out. Please try one website at a time.');throw e;}finally{clearTimeout(timer);}}
+function numberSections(){
+ let number=0;
+ document.querySelectorAll('main section .step').forEach(badge=>{
+  const section=badge.closest('section');
+  if(!section.hidden){badge.textContent=String(++number).padStart(2,'0');badge.setAttribute('aria-label','Step '+number);}
+ });
+}
 function render(){
  const site=state.sites[0],ready=!!site&&!site.error;
  $('results').hidden=!state.sites.length;$('report-actions').hidden=!state.sites.length&&!state.ai;
@@ -19,6 +26,7 @@ function render(){
  if(ai?.available&&ai.searchSuggestions){const frame=document.createElement('iframe');frame.setAttribute('title','Google Search suggestions');frame.setAttribute('sandbox','allow-popups allow-popups-to-escape-sandbox');frame.setAttribute('referrerpolicy','no-referrer');frame.style.cssText='border:0;width:100%;height:150px';frame.srcdoc=ai.searchSuggestions;$('ai-result').append(frame);}
  $('sample').disabled=!features.ai||running;
  $('email').textContent=features.email?'Send report to ALTIGRA':'Prepare email to ALTIGRA';
+ numberSections();
 }
 function report(){return {version:2,business:state.business,timestamp:new Date().toISOString(),method:'Automated initial HTML inspection and optional Gemini API discovery sample. Not Google rankings.',sites:state.sites,ai:state.ai,scores:state.sites.filter(s=>!s.error).map(s=>({name:s.url,overall:s.score,coverage:s.coverage})),gaps:(state.sites[0]?.checks||[]).filter(c=>c.status==='fail').map(c=>({title:c.label,fix:c.fix,evidence:c.evidence}))};}
 try{localStorage.removeItem('altigra-v2');}catch{}
@@ -29,5 +37,6 @@ $('download').addEventListener('click',()=>{const blob=new Blob([JSON.stringify(
 $('print').addEventListener('click',()=>window.print());
 $('email').addEventListener('click',async()=>{if(!features.email){const r=report();const summary='Business: '+r.business.name+'\nWebsite: '+r.business.url+'\n\n'+r.scores.map(s=>s.name+': '+s.overall+'/100').join('\n')+'\n\nPriority actions:\n'+r.gaps.map(g=>'- '+g.title+': '+g.fix).join('\n')+'\n\nI can attach the downloaded JSON report. Scores reflect technical HTML checks, not Google rankings.';window.location.href='mailto:info@altigra.be?cc=safi%40altigra.be&subject='+encodeURIComponent('Visibility report: '+r.business.name)+'&body='+encodeURIComponent(summary.slice(0,5000));return;}const button=$('email');button.disabled=true;$('email-status').textContent='Sending…';try{const r=await fetch('/.netlify/functions/send-audit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(report()),signal:AbortSignal.timeout(15000)});if(!r.ok)throw Error('Email was not confirmed. Download the report or email info@altigra.be.');const data=await r.json();if(!data.ok)throw Error('Email was not confirmed.');$('email-status').textContent='Report sent to ALTIGRA.';}catch(e){$('email-status').textContent=e.message;}finally{button.disabled=false;}});
 render();
-fetch('/.netlify/functions/audit',{signal:AbortSignal.timeout(8000)}).then(async r=>{if(!r.ok)throw Error();features=await r.json();$('connection').textContent='Website checks connected';$('ai-status').textContent=features.ai?'Gemini connected. Ready to sample.':'Gemini is not connected. Website checks work independently. AI samples need the site owner’s API connection.';render();}).catch(()=>{$('connection').textContent='Connection unavailable — try again shortly';$('ai-status').textContent='AI connection could not be checked.';});
+fetch('/.netlify/functions/audit',{signal:AbortSignal.timeout(8000)}).then(async r=>{if(!r.ok)throw Error();features=await r.json();$('connection').textContent='Website checks connected';$('ai-status').textContent=features.ai?'Gemini is configured. Run a sample to check the connection.':'AI discovery is currently unavailable. Website checks still work. Please contact ALTIGRA for an AI discovery review.';render();}).catch(()=>{$('connection').textContent='Connection unavailable — try again shortly';$('ai-status').textContent='AI connection could not be checked.';});
+
 
